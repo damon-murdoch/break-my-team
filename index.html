@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<html>
+
+<head>
+  <!-- Webpage Title -->
+  <title>
+    Dragapult.xyz
+  </title>
+
+  <!-- Custom Icon -->
+  <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico" />
+
+  <!-- Stylesheet Source -->
+
+  <!-- latest bootstrap release -->
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+</head>
+
+<body id="body" class="bg-secondary" style="
+      background-image: url(img/header.png);
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
+      background-size: cover;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    ">
+  <div style="
+        background-color: rgba(24, 24, 24, 0.8);
+        width: 100vw;
+        height: 100vh;
+        background-size: cover;
+        overflow: hidden;
+      ">
+    <div id="header" class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <!-- Navigation Bar -->
+      <div class="d-flex justify-content-center">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+          <a class="navbar-brand text-secondary" href="https://www.dragapult.xyz">
+            <img src="img/favicon.ico" width="30" height="30" class="d-inline-block align-top" alt="icon" />
+            Dragapult.xyz
+          </a>
+          <div id="navbar" class="d-flex justify-content-center">
+            <a class="text-secondary" href="https://www.dragapult.xyz/index.html">
+              Back to Home
+            </a>
+          </div>
+        </nav>
+      </div>
+    </div>
+    <div id="body" class="container bg-dark rounded overflow-auto my-2 pb-3" style="opacity: 0.8; max-height: 90vh">
+      <div id="title" class="text-light text-center">
+        <h2>
+          <!-- Main Page Title Goes Here-->
+          Pokémon Matchup Tool
+          <span class="h6 text-secondary">v0.0.1</span>
+        </h2>
+        <p class="text-secondary">
+          <!-- Minor Page Subtitle Goes Here -->
+          Inspired by <a class="text-secondary" href="https://github.com/jake-white">Jake White's</a> BreakMyTeam tool
+        </p>
+        <div class="container-fluid">
+          <p class="text-muted lead">
+            Developed by
+            <a class="text-secondary" href="https://twitter.com/SirScrubbington">Damon Murdoch</a>
+          </p>
+        </div>
+        <div>
+          <!-- Main Page Content Goes Here -->
+          <p>
+            Main Page Content Goes Here
+          </p>
+        </div>
+      </div>
+    </div>
+    <div id="foot"></div>
+    <div id="script">
+      <!-- JavaScript Source -->
+      
+      <!-- Pokemon Data Layer -->
+      <script src="https://unpkg.com/@smogon/calc/dist/data/production.min.js"></script>
+
+      <!-- Pokemon Calcs Library -->
+      <script src="https://unpkg.com/@smogon/calc"></script>
+
+      <!-- Main Application Source Library -->
+      <script src="index.js"></script>
+    </div>
+  </div>
+</body>
+
+</html>
