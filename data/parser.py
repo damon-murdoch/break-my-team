@@ -12,6 +12,20 @@
 # 8: Teammates
 # 9: Checks & Counters
 
+# Sector Names
+SECTORS = [
+    None, 
+    "species", 
+    "metadata",
+    "abilities", 
+    "items", 
+    "spreads", 
+    "moves", 
+    "tera types", 
+    "teammates", 
+    "counters"
+]
+
 # Split between file contents (excl. whitespace/first & last char)
 SECTOR_BREAK = '----------------------------------------'
 
@@ -37,6 +51,14 @@ def get_data_template(species = None):
         "teammates": [],
         "counters": []
     }
+
+
+def add_stats_to_current(line, list):
+    # Line Contains Stats
+    if line[-1] == '%':
+        # Split, add to current list
+        k,v = line.rsplit(" ", 1)
+        list.append(get_usage_template(k.strip(), v))
 
 def parse_format_data(content):
 
@@ -106,19 +128,27 @@ def parse_format_data(content):
                             current["metadata"]["ceiling"] = int(v)
                         case _:
                             print(f"Unhandled metadata: {k}, {v}")
-                case 3: # Abilities
-                    # Line Contains Stats
-                    if reduced[-1] == '%':
-                        # Split, add to abilities
-                        k,v = reduced.rsplit(" ", 1)
-                        current["abilities"].append(get_usage_template(k, v))
                 case _: # Default
-                    # print(f"Unhandled sector: {sector}")
-                    pass
+                    # Sector is in range
+                    if sector < len(SECTORS):
 
+                        # Get the sector id
+                        sector_name = SECTORS[sector]
+
+                        # Not 'None'
+                        if sector_name:
+                            
+                            # Add the usage stats to the sector data
+                            add_stats_to_current(reduced, current[sector_name])
+
+                        # TODO: Handle 'Else'
+
+                    # TODO: Handle 'Else'
+                    
     # File has ended
     if current:
         # Add current to data
         data.append(current)
 
-    print(data[0])
+    # Return constructed data
+    return data

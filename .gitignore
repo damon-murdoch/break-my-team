@@ -1,0 +1,4 @@
+*.pyc
+data/*.json
+data/*.txt
+!data/requirements.txt
