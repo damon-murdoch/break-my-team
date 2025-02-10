@@ -7,10 +7,9 @@ import json as JSON
 from glob import glob
 
 # Output Filepaths
-OUTJSON = "data.json"
 OUTJS = "data.js"
 
-def compile_all(outjs=OUTJS, outjson=OUTJSON):
+def compile_all(outjs=OUTJS):
 
     # Data Source
     data = {}
@@ -29,11 +28,6 @@ def compile_all(outjs=OUTJS, outjson=OUTJSON):
 
     # Dump data to JSON str
     jsonstr = JSON.dumps(data)
-
-    # Open output 'json' file
-    with open(outjson, "w+") as f:
-        # Write str to file
-        f.write(jsonstr)
 
     # Open output 'js' file
     with open(outjs, "w+") as f:
