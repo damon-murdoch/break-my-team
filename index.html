@@ -15,6 +15,9 @@
 
   <!-- latest bootstrap release -->
   <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="index.css">
 </head>
 
 <body id="body" class="bg-secondary" style="
@@ -59,8 +62,8 @@
                 id="table-pkmn-container"
                 class="col overflow-auto container bg-dark rounded ml-2 my-2"
                 style="
-                  min-width: 420px;
-                  max-width: 22vw;
+                  min-width: 320px;
+                  max-width: 16vw;
                   opacity: 0.8;
                   max-height: 90vh;
                 "
@@ -70,30 +73,52 @@
                   class="table table-dark"
                   style="overflow: hidden"
                 >
-                  <thead id="pkmn-control">
-                    <tr>
-                    </tr>
-                  </thead>
                   <thead id="pkmn-header" class="thead-dark">
                     <tr>
-                      <th scope="col">Pokemon</th>
-                      <th scope="col" class="text-center" colspan="2">
-                        <a class="text-secondary" id="paste-import" href="#">
-                          Import Team
-                        </a>
+                      <th colspan=2>
+                        Options
                       </th>
                     </tr>
                   </thead>
+                  <tbody>
+                    <tr>
+                      <th colspan=2>
+                        <select class="form-control form-control" id="fmt-select" onChange="update(value)">
+                          <!-- Options added by index.js -->
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Level
+                      </th>
+                      <td>
+                        <input id="lvl-input" class="form-control form-control" type="number" min="1" max="100" value="50" onchange="update()">
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Field
+                      </th>
+                      <th>
+                        <select id="field-input" class="form-control form-control" onchange="update()">
+                          <option>
+                            Singles
+                          </option>
+                          <option selected>
+                            Doubles
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                  </tbody>
+                  <!--
                   <table
                     id="table-pkmn-import"
                     class="table"
                     style="overflow-y: scroll"
                   ></table>
-                  <table
-                    id="table-pkmn-contents"
-                    class="table"
-                    style="overflow-y: scroll"
-                  ></table>
+                  -->
                 </table>
               </div>
               <div
@@ -119,9 +144,32 @@
                   </div>
                 </div>
                 <div id="bmt-main" class="text-center">
-                  <select class="form-control" id="fmt-select">
-                    <!-- Options added by index.js -->
-                  </select>
+                  <table class="table table-dark">
+                    <thead>
+                      <tr>
+                        <th>
+                          <a id="paste-import" class="text-light" href="#">
+                            Import Team
+                          </a>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody id="table-pkmn-import">
+                    </tbody>
+                  </table>
+                  <!-- Un-hidden when team loaded -->
+                  <table id="table-pkmn" class="table table-dark">
+                    <thead>
+                      <tr id="tr-pkmn-head">
+                        <th class="align-middle">
+                          brmt :)
+                        </th>
+                        <!-- Populated by sprites -->
+                      </tr>
+                    </thead>
+                    <tbody id="tbody-pkmn-main">
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
@@ -132,12 +180,26 @@
     <div id="foot"></div>
     <div id="script">
       <!-- JavaScript Source -->
-      
+
       <!-- Pokemon Data Layer -->
+      <!-- TODO: Local copy of this! -->
       <script src="https://unpkg.com/@smogon/calc/dist/data/production.min.js"></script>
 
       <!-- Pokemon Calcs Library -->
+      <!-- TODO: Local copy of this! -->
       <script src="https://unpkg.com/@smogon/calc"></script>
+
+      <!-- Program Calculation Library -->
+      <script src="src/calculate.js"></script>
+
+      <!-- Pokemon Showdown! Parsing Library -->
+      <script src="src/parser.js"></script>
+
+      <!-- Program Common Library -->
+      <script src="src/common.js"></script>
+
+      <!-- Program Config Script -->
+      <script src="src/config.js"></script>
 
       <!-- Data Source Library -->
       <script src="data/data.js"></script>

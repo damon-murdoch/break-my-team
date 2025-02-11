@@ -1,0 +1,43 @@
+/* Simple half-split layout */
+.damage-cell {
+  position: relative;
+  height: 60px;
+}
+
+.damage-cell div {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  padding: 5px;
+}
+
+.top-half {
+  top: 0;
+  height: 50%;
+}
+
+.bottom-half {
+  bottom: 0;
+  height: 50%;
+}
+
+.verygood {
+  background-color: #155724; /* Dark green */
+}
+
+.good {
+  background-color: #28a745; /* Green */
+}
+
+.neutral {
+  background-color: #ffc107; /* Yellow */
+}
+
+.bad {
+  background-color: #dc3545; /* Red */
+}
+
+.verybad {
+  background-color: #721c24; /* Dark red */
+}
