@@ -22,6 +22,48 @@ function getFormat() {
   return document.getElementById('fmt-select').value;
 }
 
+function getWeather() {
+  const weather = document.getElementById('weather-select').value;
+  if (weather === 'none') 
+    return undefined;
+  return weather;
+}
+
+function getTerrain() {
+  const terrain = document.getElementById('terrain-select').value;
+  if (terrain === 'none') 
+    return undefined;
+  return terrain; 
+}
+
+function getFieldEffects () {
+  return {
+    weather: getWeather(), 
+    terrain: getTerrain(), 
+    isGravity: (document.getElementById('gravity-select').value == 'true'), 
+    isAuraBreak: (document.getElementById('ab-select').value == 'true'), 
+    isFairyAura: (document.getElementById('da-select').value == 'true'), 
+    isDarkAura: (document.getElementById('fa-select').value == 'true'), 
+    isBeadsOfRuin: (document.getElementById('bor-select').value == 'true'), 
+    isSwordOfRuin: (document.getElementById('sor-select').value == 'true'), 
+    isTabletsOfRuin: (document.getElementById('tor-select').value == 'true'), 
+    isVesselOfRuin: (document.getElementById('vor-select').value == 'true')
+  }
+}
+
+function getPlayerEffects () {
+  // Get the value for the screens, reflect drop-downs
+  const screens = document.getElementById('screens-select').value;
+  const reflect = document.getElementById('reflect-select').value;
+
+  return {
+    'player': {
+      'screens': (screens == 'player' || screens == 'both'),
+      'reflect': (reflect == 'player' || reflect == 'both'),
+    }
+  }
+}
+
 function getFormatInfo(format) {
   // Split format by tokens
   tokens = format.split('-');
@@ -87,20 +129,29 @@ function showPokemonTable(show=true) {
 }
 
 // Clear the table
+function clearTable() {
+  // Clear the main table
+  const main = document.getElementById('tbody-pkmn-main');
+  main.innerHTML = "";
+}
+
+// Clear the table
 function reset() {
   // Hide pokemon table
-  // showPokemonTable(false);
+  showPokemonTable(false);
 
   // Clear the sets
   document.sets = null;
+
+  // Clear the ranking
+  document.ranking = null;
 
   // Reset the headers
   const head = document.getElementById("tr-pkmn-head");
   head.innerHTML = "<th class='align-middle'>brmt :)</th>";
 
-  // Clear the main table
-  const main = document.getElementById('tbody-pkmn-main');
-  main.innerHTML = "";
+  // Clear the table
+  clearTable();
 }
 
 function addThreat(set, parent) {
@@ -111,8 +162,11 @@ function addThreat(set, parent) {
   const species = sanitiseString(pokemon.name);
   const item = itemString(pokemon.item);
 
+  // Generate the mon tooltip
+  const tooltip = getThreatTooltip(pokemon);
+
   // Generate the sprite string for the species, item
-  const spriteStr = getSpriteString(species, item);
+  const spriteStr = getSpriteString(species, item, tooltip);
 
   // Add sprite to row
   parent.innerHTML += spriteStr;
@@ -127,8 +181,11 @@ function addPokemon(set) {
   const species = sanitiseString(set.species);
   const item = itemString(set.item);
 
+  // Generate the mon tooltip
+  const tooltip = getMonTooltip(set);
+
   // Generate the sprite string for the species, item
-  const spriteStr = getSpriteString(species, item);
+  const spriteStr = getSpriteString(species, item, tooltip);
 
   // Add sprite to row
   tr.innerHTML += spriteStr;
@@ -143,9 +200,6 @@ function importShowdown() {
 
   // Parse the sets from the import
   const sets = parseSets(content);
-
-  // Reset the table
-  reset();
 
   // Loop over the sets
   for (const set of sets) {
@@ -163,7 +217,67 @@ function importShowdown() {
   update();
 
   // Show the Pokemon table
-  // showPokemonTable(true);
+  showPokemonTable(true);
+}
+
+function rankingSortFunc(a, b) {
+  // Sort method changes depending on 'method' selected
+  const method = document.getElementById('sort-input').value;
+  switch(method) {
+    // No need to do anything
+    case "usage": return 0;
+    // Best MU First
+    case "best": {
+      if (document.ranking) {
+        return document.ranking[b] - document.ranking[a];
+      }
+    }; break;
+    // Worst MU First
+    case "worst": {
+      if (document.ranking) {
+        return document.ranking[a] - document.ranking[b];
+      }
+    }; break;
+  }
+  // Fallback
+  return 0;
+}
+
+function getMatchupRanking(table, members, threats) {
+  
+  // Matchup ranking
+  let ranking = {
+    // Total matchup val. for whole team
+  }
+
+  // Loop over the threats
+  for(const threat of threats) {
+    
+    // Get the number of sets for the threat
+    const sets = table[members[0]].opponents[threat];
+
+    // Loop over all of the sets
+    for(const setIndex in sets) {
+      
+      // Overall threat matchup
+      let matchup = 0;
+      
+      // Loop over the members
+      for(const member of members) {
+        // Get the matchup data for the member, threat
+        const setData = table[member].opponents[threat][setIndex];
+
+        // Update the overall matchup
+        matchup += setData.matchup;
+      }
+
+      // Update the ranking
+      ranking[threat] = matchup;
+    }
+  }
+
+  // Return ranking
+  return ranking;
 }
 
 function populateTable(table) {
@@ -179,6 +293,12 @@ function populateTable(table) {
 
     // Get all of the threats
     const threats = Object.keys(table[members[0]].opponents);
+
+    // Get the matchup ranking table (for sorting the table)
+    document.ranking = getMatchupRanking(table, members, threats);
+
+    // Sort the threats depending on settings
+    threats.sort(rankingSortFunc);
 
     // Loop over the threats
     for(const threat of threats) {
@@ -228,16 +348,14 @@ function populateTable(table) {
           else // No attack
           {
             // Cannot do any damage
-            bottom.innerHTML = '-';
-            bottom.classList.add('verybad');
+            top.innerHTML = '-';
+            top.classList.add('verybad');
           }
           td.appendChild(top);
 
           // Cell Bottom Half (Opponent Damage)
           const bottom = document.createElement('div');
           bottom.classList.add('bottom-half');
-
-          console.log(setData.defending.length);
 
           // Get the best attack for the opponent
           const oBestAttack = setData.defending.at(0);
@@ -298,6 +416,10 @@ function update(format=null) {
 
   // Sets defined
   if (sets) {
+        
+    // Clear the table
+    clearTable();
+    
     // Generate the table for the sets, format, level & field
     const table = calculateTeam(sets, DATA[format], info, level, field);
 
@@ -312,6 +434,11 @@ function update(format=null) {
 document
   .getElementById("paste-import")
   .addEventListener("click", async (event) => {
+
+    // Reset the table
+    reset();
+
+    // Add 'import team' form
     document.getElementById("table-pkmn-import").innerHTML = `
   <tr>
     <td>

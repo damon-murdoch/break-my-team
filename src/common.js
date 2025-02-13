@@ -1,3 +1,29 @@
+// toCapitalCase(str: string)
+// Returns the provided string
+// with the first letter of each
+// word capitalised.
+function toCapitalCase(str) {
+  // Split the string on the spaces
+  let spl = str.split(" ");
+
+  // Loop over the string splits
+  for (let i = 0; i < spl.length; i++) {
+    // If the string is greater
+    // than one character
+    if (spl[i].length > 1) {
+      // Capitalise the first letter, add the rest as lowercase
+      spl[i] = spl[i].charAt(0).toUpperCase() + spl[i].slice(1).toLowerCase();
+    } // String is one or less characters
+    else {
+      // Convert the string to upper case
+      spl[i] = spl[i].toUpperCase();
+    }
+  }
+
+  // Join the split string on spaces
+  return spl.join(` `);
+}
+
 function sanitiseMoveDesc(str) {
   return str.split('(')[0];
 }
@@ -40,9 +66,114 @@ function getMatchupColour(n) {
   }
 }
 
-function getSpriteString(species, item) {
+function getThreatTooltip (mon) {
+
+  // Tooltip Text (e.g. Urshifu @ Focus Sash)
+  let tooltip = `${mon.name} @ ${mon.item}\n`;
+
+  // Add EVs (If provided)
+  const evs = getStatString(mon.evs);
+  if (evs) {
+    tooltip += `EVs: ${evs}\n`;
+  }
+
+  // Add IVs (If provided)
+  const ivs = getStatString(mon.ivs, 31);
+  if (ivs) {
+    tooltip += `IVs: ${ivs}\n`;
+  }
+
+  /*
+  // Other properties
+  for (const other in set.other) {
+
+    // Create the k/v pair
+    const k = toCapitalCase(other);
+    const v = set.other[other];
+
+    // Add other properties to tooltip
+    tooltip += `${k}: ${v}\n`;
+  }
+  */
+
+  // Tera type
+  if (mon["tera type"]) {
+    tooltip += `Tera Type: ${mon["tera type"]}\n`;
+  }
+
+  // Add nature
+  if (mon.nature) {
+    tooltip += `${mon.nature} nature\n`;
+  }
+
+  // Add moves
+  let n=0;
+  for(const move of mon.moves) {
+    if (n < 4) {
+      tooltip += `- ${move}\n`;
+    } else {
+      tooltip += `(+${mon.moves.length-n} more)\n`;
+      break;
+    }
+    n++;
+  }
+
+  return tooltip;
+}
+
+function getMonTooltip (set) {
+  // Tooltip Text (e.g. Urshifu @ Focus Sash)
+  let tooltip = `${set.species} @ ${set.item}\n`;
+
+  // Add EVs (If provided)
+  const evs = getStatString(set.evs);
+  if (evs) {
+    tooltip += `EVs: ${evs}\n`;
+  }
+
+  // Add IVs (If provided)
+  const ivs = getStatString(set.ivs, 31);
+  if (ivs) {
+    tooltip += `IVs: ${ivs}\n`;
+  }
+
+  // Other properties
+  for (const other in set.other) {
+
+    // Create the k/v pair
+    const k = toCapitalCase(other);
+    const v = set.other[other];
+
+    // Add other properties to tooltip
+    tooltip += `${k}: ${v}\n`;
+  }
+
+  // Add nature
+  if (set.nature) {
+    tooltip += `${set.nature} nature\n`;
+  }
+
+  // Add moves
+  for(const move of set.moves) {
+    tooltip += `- ${move}\n`;
+  }
+
+  return tooltip;
+}
+
+function getSpriteString(species, item, tooltip = null) {
+
+  // Tool tip html code
+  let tooltipHtml = "";
+  if (tooltip !== null) {
+    // Generate the html code for the tool-tip to display
+    tooltipHtml = ` data-bs-toggle="tooltip" title="${tooltip}"`;
+  }
+
   return `
-  <th style="position: relative;">
+  <th 
+    style="position: relative;"${tooltipHtml}
+  >
     <img src="img/box/${species}.png" style="width: 100%; height: auto;">
     <img src="img/item/${item}.png" style="
       position: absolute;

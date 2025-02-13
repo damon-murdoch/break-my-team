@@ -2,9 +2,11 @@ function getCalcOpp(mon, spread, item) {
   return {
     "pokemon": {
       "name": mon.name,
+      "tera type": mon.teraType,
       "ability": mon.ability,
       "nature": spread.nature,
       "stats": mon.stats,
+      "moves": mon.moves,
       "item": item,
       "evs": spread.stats,
       "ivs": mon.ivs,
@@ -118,6 +120,18 @@ function challengeSpecies(mon, usage, options) {
     defenderSide: CONFIG.field.defenderSide,
   });
 
+  // Check for weather
+  const weather = getWeather();
+  if (weather) {
+    field.weather = weather;
+  }
+
+  // Check for terrain
+  const terrain = getTerrain();
+  if (terrain) {
+    field.terrain = terrain;
+  }
+
   // Dereference generation
   const gen = mon.gen;
 
@@ -134,221 +148,246 @@ function challengeSpecies(mon, usage, options) {
     if (spreadCount >= CONFIG.limit.spreads) {
       break;
     }
-
+    
     // Counter
-    let itemCount = 0;
+    let teraCount = 0;
 
-    // Loop over the items for the mon
-    for (const usageItem of usage.items) {
-      // Spread limit exceeded
-      if (itemCount >= CONFIG.limit.items) {
+    // Loop over the tera types for the mon
+    for (const usageTera of usage["tera types"]) {
+
+      // Tera limit exceeded
+      if (teraCount >= CONFIG.limit.teras) {
         break;
       }
 
-      // Get the item name
-      const item = usageItem.option;
+      // Get the type name
+      const tera = usageTera.option;
 
-      // Get species for the usage
-      let species = usage.species;
+      // Counter
+      let itemCount = 0;
 
-      // Get the most common ability (highest usage)
-      let ability = usage.abilities.at(0).option;
-
-      // Get the list of mega stones
-      const megaStones = Object.keys(calc.MEGA_STONES);
-
-      // If the item is a mega stone
-      if (megaStones.includes(item)) {
-        // If the mega stone matches the species
-        if (species === calc.MEGA_STONES[item]) {
-          // Update the species
-          species = stone.forme;
-
-          // Clear the ability
-          ability = undefined;
+      // Loop over the items for the mon
+      for (const usageItem of usage.items) {
+        // Spread limit exceeded
+        if (itemCount >= CONFIG.limit.items) {
+          break;
         }
-      }
 
-      // Convert string to spread
-      const spread = getSpread(usageSpread.option);
+        // Get the item name
+        const item = usageItem.option;
 
-      try {
-        // Switch on species
-        switch (species) {
-          case "Aegislash":
-            {
-              // Use Blade Forme when Attacking
-              const oppAtk = new calc.Pokemon(gen, "Aegislash-Blade", {
-                level: mon.level,
-                ability: ability,
-                nature: spread.nature,
-                item: item,
-                evs: spread.stats,
-              });
+        // Get species for the usage
+        let species = usage.species;
 
-              // Use Shield Forme when Defending
-              const oppDef = new calc.Pokemon(gen, "Aegislash-Shield", {
-                level: mon.level,
-                ability: ability,
-                nature: spread.nature,
-                item: item,
-                evs: spread.stats,
-              });
+        // Get the most common ability (highest usage)
+        let ability = usage.abilities.at(0).option;
 
-              // Create the calc opponent object
-              const opponent = getCalcOpp(oppDef, spread, item);
+        // Get the list of mega stones
+        const megaStones = Object.keys(calc.MEGA_STONES);
 
-              // Defend only NOT set
-              if (!options.defendOnly) {
-                // Loop over team moves
-                for (const moveName of mon.moves) {
-                  const move = new calc.Move(gen, moveName);
-                  const result = calc.calculate(gen, mon, oppDef, move, field);
-                  if (result.damage != 0) {
-                    opponent.attacking.push({
-                      data: {
-                        kochance: result.kochance(),
-                        range: result.range(),
-                      },
-                      fullDesc: result.fullDesc(), 
-                      moveDesc: result.moveDesc(),
-                      desc: result.desc(),
-                      move: result.move.name,
-                    });
+        // If the item is a mega stone
+        if (megaStones.includes(item)) {
+          // If the mega stone matches the species
+          if (species === calc.MEGA_STONES[item]) {
+            // Update the species
+            species = stone.forme;
+
+            // Clear the ability
+            ability = undefined;
+          }
+        }
+
+        // Convert string to spread
+        const spread = getSpread(usageSpread.option);
+
+        try {
+          // Switch on species
+          switch (species) {
+            case "Aegislash":
+              {
+                // Use Blade Forme when Attacking
+                const oppAtk = new calc.Pokemon(gen, "Aegislash-Blade", {
+                  level: mon.level,
+                  ability: ability,
+                  nature: spread.nature,
+                  // teraType: tera, 
+                  item: item,
+                  evs: spread.stats,
+                });
+
+                // Use Shield Forme when Defending
+                const oppDef = new calc.Pokemon(gen, "Aegislash-Shield", {
+                  level: mon.level,
+                  ability: ability,
+                  nature: spread.nature,
+                  // teraType: tera, 
+                  item: item,
+                  evs: spread.stats,
+                });
+
+                // Create the calc opponent object
+                const opponent = getCalcOpp(oppDef, spread, item);
+                opponent.pokemon.moves = usage.moves.map((x) => x.option);
+                opponent.pokemon["tera type"] = tera;
+
+                // Defend only NOT set
+                if (!options.defendOnly) {
+                  // Loop over team moves
+                  for (const moveName of mon.moves) {
+                    const move = new calc.Move(gen, moveName);
+                    const result = calc.calculate(gen, mon, oppDef, move, field);
+                    if (result.damage != 0) {
+                      opponent.attacking.push({
+                        data: {
+                          kochance: result.kochance(),
+                          range: result.range(),
+                        },
+                        fullDesc: result.fullDesc(),
+                        moveDesc: result.moveDesc(),
+                        desc: result.desc(),
+                        move: result.move.name,
+                      });
+                    }
                   }
+
+                  // Sort the attacks from most to least effective
+                  opponent.attacking.sort(moveSortFunc);
                 }
 
-                // Sort the attacks from most to least effective
-                opponent.attacking.sort(moveSortFunc);
-              }
+                // Attack only NOT set
+                if (!options.attackOnly) {
+                  // Counter
+                  let moveCount = 0;
 
-              // Attack only NOT set
-              if (!options.attackOnly) {
-                // Counter
-                let moveCount = 0;
+                  for (const usageMove of usage.moves) {
+                    // Break after limit
+                    if (moveCount >= CONFIG.limit.moves)
+                      break;
 
-                for (const usageMove of usage.moves) {
-                  // Break after limit
-                  if (moveCount >= CONFIG.limit.moves) 
-                    break;
-                  
-                  // Get the name for the move
-                  const moveName = usageMove.option;
-                  const move = new calc.Move(gen, moveName);
-                  const result = calc.calculate(gen, oppAtk, mon, move, field);
-                  if (result.damage != 0) {
-                    opponent.defending.push({
-                      data: {
-                        kochance: result.kochance(),
-                        range: result.range(),
-                      },
-                      fullDesc: result.fullDesc(), 
-                      moveDesc: result.moveDesc(),
-                      desc: result.desc(),
-                      move: result.move.name,
-                    });
-                    moveCount++;
+                    // Get the name for the move
+                    const moveName = usageMove.option;
+                    const move = new calc.Move(gen, moveName);
+                    const result = calc.calculate(gen, oppAtk, mon, move, field);
+                    if (result.damage != 0) {
+                      opponent.defending.push({
+                        data: {
+                          kochance: result.kochance(),
+                          range: result.range(),
+                        },
+                        fullDesc: result.fullDesc(),
+                        moveDesc: result.moveDesc(),
+                        desc: result.desc(),
+                        move: result.move.name,
+                      });
+                      moveCount++;
+                    }
                   }
+
+                  // Sort the attacks from most to least effective
+                  opponent.defending.sort(moveSortFunc);
                 }
-
-                // Sort the attacks from most to least effective
-                opponent.defending.sort(moveSortFunc);
-              }
-
-              // Calculate the matchup odds for the opponent
-              opponent.matchup = getPredictedWinner(opponent);
-
-              // Add to the opponents
-              opponents.push(opponent);
-            }
-            break;
-          default:
-            {
-              // Generate mon for the spread
-              const opp = new calc.Pokemon(gen, species, {
-                level: mon.level,
-                ability: ability,
-                nature: spread.nature,
-                item: item,
-                evs: spread.stats,
-              });
-
-              // Create the calc opponent object
-              const opponent = getCalcOpp(opp, spread, item);
-
-              // Defend only NOT set
-              if (!options.defendOnly) {
-                // Loop over team moves
-                for (const moveName of mon.moves) {
-                  const move = new calc.Move(gen, moveName);
-                  const result = calc.calculate(gen, mon, opp, move, field);
-                  if (result.damage != 0) {
-                    opponent.attacking.push({
-                      data: {
-                        kochance: result.kochance(),
-                        range: result.range(),
-                      },
-                      fullDesc: result.fullDesc(), 
-                      moveDesc: result.moveDesc(),
-                      desc: result.desc(),
-                      move: result.move.name,
-                    });
-                  }
-                }
-
-                // Sort the attacks from most to least effective
-                opponent.attacking.sort(moveSortFunc);
-              }
-
-              // Attack only NOT set
-              if (!options.attackOnly) {
-                // Counter
-                let moveCount = 0;
-
-                // Loop over mon moves
-                for (const usageMove of usage.moves) {
-                  // Break after limit
-                  if (moveCount >= CONFIG.limit.moves) 
-                    break;
-                  
-                  // Get the name for the move
-                  const moveName = usageMove.option;
-                  const move = new calc.Move(gen, moveName);
-                  const result = calc.calculate(gen, opp, mon, move, field);
-                  if (result.damage != 0) {
-                    opponent.defending.push({
-                      data: {
-                        kochance: result.kochance(),
-                        range: result.range(),
-                      },
-                      fullDesc: result.fullDesc(), 
-                      moveDesc: result.moveDesc(),
-                      desc: result.desc(),
-                      move: result.move.name,
-                    });
-                    moveCount++;
-                  }
-                }
-
-                // Sort the attacks from most to least effective
-                opponent.defending.sort(moveSortFunc);
 
                 // Calculate the matchup odds for the opponent
                 opponent.matchup = getPredictedWinner(opponent);
-              }
 
-              // Add to the opponents
-              opponents.push(opponent);
-            }
-            break;
+                // Add to the opponents
+                opponents.push(opponent);
+              }
+              break;
+            default:
+              {
+                // Generate mon for the spread
+                const opp = new calc.Pokemon(gen, species, {
+                  level: mon.level,
+                  ability: ability,
+                  nature: spread.nature,
+                  // teraType: tera,
+                  item: item,
+                  evs: spread.stats,
+                });
+
+                // Create the calc opponent object
+                const opponent = getCalcOpp(opp, spread, item);
+                opponent.pokemon.moves = usage.moves.map((x) => x.option);
+                opponent.pokemon["tera type"] = tera;
+
+                // Defend only NOT set
+                if (!options.defendOnly) {
+                  // Loop over team moves
+                  for (const moveName of mon.moves) {
+                    const move = new calc.Move(gen, moveName);
+                    const result = calc.calculate(gen, mon, opp, move, field);
+                    if (result.damage != 0) {
+                      opponent.attacking.push({
+                        data: {
+                          kochance: result.kochance(),
+                          range: result.range(),
+                        },
+                        fullDesc: result.fullDesc(),
+                        moveDesc: result.moveDesc(),
+                        desc: result.desc(),
+                        move: result.move.name,
+                      });
+                    }
+                  }
+
+                  // Sort the attacks from most to least effective
+                  opponent.attacking.sort(moveSortFunc);
+                }
+
+                // Attack only NOT set
+                if (!options.attackOnly) {
+                  // Counter
+                  let moveCount = 0;
+
+                  // Loop over mon moves
+                  for (const usageMove of usage.moves) {
+                    // Break after limit
+                    if (moveCount >= CONFIG.limit.moves)
+                      break;
+
+                    // Get the name for the move
+                    const moveName = usageMove.option;
+                    const move = new calc.Move(gen, moveName);
+                    const result = calc.calculate(gen, opp, mon, move, field);
+                    if (result.damage != 0) {
+                      opponent.defending.push({
+                        data: {
+                          kochance: result.kochance(),
+                          range: result.range(),
+                        },
+                        fullDesc: result.fullDesc(),
+                        moveDesc: result.moveDesc(),
+                        desc: result.desc(),
+                        move: result.move.name,
+                      });
+                      moveCount++;
+                    }
+                  }
+
+                  // Sort the attacks from most to least effective
+                  opponent.defending.sort(moveSortFunc);
+
+                  // Calculate the matchup odds for the opponent
+                  opponent.matchup = getPredictedWinner(opponent);
+                }
+
+                // Add to the opponents
+                opponents.push(opponent);
+              }
+              break;
+          }
+        } catch (
+        e // Failed for species ...
+        ) {
+          console.warn(`Failed for species '${species}': ${String(e)} ...`);
         }
-      } catch (
-      e // Failed for species ...
-      ) {
-        console.warn(`Failed for species '${species}': ${String(e)} ...`);
+
+        itemCount++;
       }
 
-      itemCount++;
+      // Increment
+      teraCount++;
     }
 
     spreadCount++;
@@ -440,6 +479,7 @@ function calculateTeam(team, usage, format, level = 50, field = 'Doubles') {
             evs: set.evs,
             ability: set.ability,
             moves: set.moves,
+            item: set.item
           });
 
           // Get calcs table

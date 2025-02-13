@@ -69,22 +69,45 @@
                 "
               >
                 <table
-                  id="table-pkmn"
+                  id="table-options"
                   class="table table-dark"
-                  style="overflow: hidden"
+                  style="overflow-y: scroll"
                 >
                   <thead id="pkmn-header" class="thead-dark">
                     <tr>
                       <th colspan=2>
-                        Options
+                        Format
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
                       <th colspan=2>
-                        <select class="form-control form-control" id="fmt-select" onChange="update(value)">
+                        <select class="form-control" id="fmt-select" onChange="update(value)">
                           <!-- Options added by index.js -->
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th colspan=2>
+                        Options
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Sort By
+                      </th>
+                      <th>
+                        <select id="sort-input" class="form-control" onchange="update()">
+                          <option value="usage">
+                            Usage
+                          </option>
+                          <option value="best">
+                            Best First
+                          </option>
+                          <option value="worst" selected>
+                            Worst First
+                          </option>
                         </select>
                       </th>
                     </tr>
@@ -93,7 +116,7 @@
                         Level
                       </th>
                       <td>
-                        <input id="lvl-input" class="form-control form-control" type="number" min="1" max="100" value="50" onchange="update()">
+                        <input id="lvl-input" class="form-control" type="number" min="1" max="100" value="50" onchange="update()">
                       </td>
                     </tr>
                     <tr>
@@ -101,7 +124,7 @@
                         Field
                       </th>
                       <th>
-                        <select id="field-input" class="form-control form-control" onchange="update()">
+                        <select id="field-input" class="form-control" onchange="update()">
                           <option>
                             Singles
                           </option>
@@ -111,14 +134,244 @@
                         </select>
                       </th>
                     </tr>
+                    <tr>
+                      <th colspan=2>
+                        Weather & Terrain
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Weather
+                      </th>
+                      <th>
+                        <select id="weather-select" class="form-control" onchange="update()">
+                          <option value="none" selected>
+                            Default
+                          </option>
+                          <option value="Sand">
+                            Sand
+                          </option>
+                          <option value="Sun">
+                            Sun
+                          </option>
+                          <option value="Rain">
+                            Rain
+                          </option>
+                          <option value="Hail">
+                            Hail
+                          </option>
+                          <option value="Snow">
+                            Snow
+                          </option>
+                          <option value="Harsh Sunshine">
+                            Harsh Sun
+                          </option>
+                          <option value="Heavy Rain">
+                            Heavy Rain
+                          </option>
+                          <option value="Strong Winds">
+                            Strong Winds
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Terrain
+                      </th>
+                      <th>
+                        <select id="terrain-select" class="form-control" onchange="update()">
+                          <option value="none" selected>
+                            Default
+                          </option>
+                          <option value="Electric">
+                            Electric
+                          </option>
+                          <option value="Psychic">
+                            Psychic
+                          </option>
+                          <option value="Grassy">
+                            Grassy
+                          </option>
+                          <option value="Misty">
+                            Misty
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th colspan=2>
+                        Player Effects
+                      </th>
+                    </tr>
+                    <tr>
+                      <th>
+                        Light Screen
+                      </th>
+                      <th>
+                        <select id="screens-select" class="form-control" onchange="update()">
+                          <option value="none" selected>
+                            Default
+                          </option>
+                          <option value="Player">
+                            Player
+                          </option>
+                          <option value="Opponent">
+                            Opponent
+                          </option>
+                          <option value="Both">
+                            Both
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th>
+                        Reflect
+                      </th>
+                      <th>
+                        <select id="reflect-select" class="form-control" onchange="update()">
+                          <option value="none" selected>
+                            Default
+                          </option>
+                          <option value="Player">
+                            Player
+                          </option>
+                          <option value="Opponent">
+                            Opponent
+                          </option>
+                          <option value="Both">
+                            Both
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th colspan="2">
+                        Other Effects
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Gravity
+                      </th>
+                      <th>
+                        <select id="gravity-select" class="form-control" onchange="update()">
+                          <option value="false" selected>
+                            Disabled
+                          </option>
+                          <option value="true">
+                            Enabled
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Beads of Ruin
+                      </th>
+                      <th>
+                        <select id="bor-select" class="form-control" onchange="update()">
+                          <option value="false" selected>
+                            Disabled
+                          </option>
+                          <option value="true">
+                            Enabled
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Sword of Ruin
+                      </th>
+                      <th>
+                        <select id="sor-select" class="form-control" onchange="update()">
+                          <option value="false" selected>
+                            Disabled
+                          </option>
+                          <option value="true">
+                            Enabled
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Tablets of Ruin
+                      </th>
+                      <th>
+                        <select id="tor-select" class="form-control" onchange="update()">
+                          <option value="false" selected>
+                            Disabled
+                          </option>
+                          <option value="true">
+                            Enabled
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Vessel of Ruin
+                      </th>
+                      <th>
+                        <select id="vor-select" class="form-control" onchange="update()">
+                          <option value="false" selected>
+                            Disabled
+                          </option>
+                          <option value="true">
+                            Enabled
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Fairy Aura
+                      </th>
+                      <th>
+                        <select id="fa-select" class="form-control" onchange="update()">
+                          <option value="false" selected>
+                            Disabled
+                          </option>
+                          <option value="true">
+                            Enabled
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Dark Aura
+                      </th>
+                      <th>
+                        <select id="da-select" class="form-control" onchange="update()">
+                          <option value="false" selected>
+                            Disabled
+                          </option>
+                          <option value="true">
+                            Enabled
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Aura Break
+                      </th>
+                      <th>
+                        <select id="ab-select" class="form-control" onchange="update()">
+                          <option value="false" selected>
+                            Disabled
+                          </option>
+                          <option value="true">
+                            Enabled
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
                   </tbody>
-                  <!--
-                  <table
-                    id="table-pkmn-import"
-                    class="table"
-                    style="overflow-y: scroll"
-                  ></table>
-                  -->
                 </table>
               </div>
               <div
@@ -161,7 +414,7 @@
                   <table id="table-pkmn" class="table table-dark">
                     <thead>
                       <tr id="tr-pkmn-head">
-                        <th class="align-middle">
+                        <th class="align-middle" hidden>
                           brmt :)
                         </th>
                         <!-- Populated by sprites -->
