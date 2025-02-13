@@ -14,10 +14,6 @@ function getLevel() {
   return parseInt(document.getElementById('lvl-input').value);
 }
 
-function getField() {
-  return document.getElementById('field-input').value;
-}
-
 function getFormat() {
   return document.getElementById('fmt-select').value;
 }
@@ -36,19 +32,48 @@ function getTerrain() {
   return terrain; 
 }
 
-function getFieldEffects () {
-  return {
-    weather: getWeather(), 
-    terrain: getTerrain(), 
-    isGravity: (document.getElementById('gravity-select').value == 'true'), 
-    isAuraBreak: (document.getElementById('ab-select').value == 'true'), 
-    isFairyAura: (document.getElementById('da-select').value == 'true'), 
-    isDarkAura: (document.getElementById('fa-select').value == 'true'), 
-    isBeadsOfRuin: (document.getElementById('bor-select').value == 'true'), 
-    isSwordOfRuin: (document.getElementById('sor-select').value == 'true'), 
-    isTabletsOfRuin: (document.getElementById('tor-select').value == 'true'), 
-    isVesselOfRuin: (document.getElementById('vor-select').value == 'true')
-  }
+function getGameType() {
+  return document.getElementById('field-input').value;
+}
+
+function getConfigFieldEffects () {
+
+  // Default (Game Type)
+  const fieldEffects = {
+    gameType: getGameType()
+  };
+
+  // Weather
+  const weather = getWeather();
+  if (weather) fieldEffects.weather = weather;
+
+  // Terrain
+  const terrain = getTerrain();
+  if (terrain) fieldEffects.terrain = terrain;
+
+  // Gravity
+  const isGravity = (document.getElementById('gravity-select').value == 'true');
+  if (isGravity) fieldEffects.isGravity = true;
+
+  // Ruins
+
+  // Beads of Ruin
+  const isBeadsOfRuin = (document.getElementById('bor-select').value == 'true'); 
+  if (isBeadsOfRuin) fieldEffects.isBeadsOfRuin = true;
+
+  // Sword of Ruin
+  const isSwordOfRuin = (document.getElementById('sor-select').value == 'true'); 
+  if (isSwordOfRuin) fieldEffects.isSwordOfRuin = true;
+
+  // Tablets of Ruin
+  const isTabletsOfRuin = (document.getElementById('tor-select').value == 'true'); 
+  if (isTabletsOfRuin) fieldEffects.isTabletsOfRuin = true;
+
+  // Vessel of Ruin
+  const isVesselOfRuin = (document.getElementById('vor-select').value == 'true');
+  if (isVesselOfRuin) fieldEffects.isVesselOfRuin = true;
+
+  return fieldEffects;
 }
 
 function getPlayerEffects () {
@@ -58,8 +83,12 @@ function getPlayerEffects () {
 
   return {
     'player': {
-      'screens': (screens == 'player' || screens == 'both'),
-      'reflect': (reflect == 'player' || reflect == 'both'),
+      'isLightScreen': (screens == 'Player' || screens == 'Both'),
+      'isReflect': (reflect == 'Player' || reflect == 'Both'),
+    }, 
+    'opponent': {
+      'isLightScreen': (screens == 'Opponent' || screens == 'Both'),
+      'isReflect': (reflect == 'Opponent' || reflect == 'Both'),
     }
   }
 }
@@ -408,9 +437,6 @@ function update(format=null) {
   // Get the selected level
   const level = getLevel();
 
-  // Get the selected field
-  const field = getField();
-
   // Get the sets from the document
   const sets = document.sets;
 
@@ -421,7 +447,7 @@ function update(format=null) {
     clearTable();
     
     // Generate the table for the sets, format, level & field
-    const table = calculateTeam(sets, DATA[format], info, level, field);
+    const table = calculateTeam(sets, DATA[format], info, level);
 
     // Populate the pkmn table
     populateTable(table);

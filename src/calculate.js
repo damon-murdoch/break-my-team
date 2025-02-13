@@ -111,26 +111,153 @@ function moveSortFunc(a, b) {
   return total(b.data.range) - total(a.data.range);
 }
 
-function challengeSpecies(mon, usage, options) {
+// mon, oppDef, defaultField, playerEffects
 
-  // Get the default field
-  const field = new calc.Field({
-    gameType: options.field,
-    attackerSide: CONFIG.field.attackerSide,
-    defenderSide: CONFIG.field.defenderSide,
-  });
+function getMonFieldEffects (mon) {
+  const fieldEffects = {};
+  switch(mon.ability) {
+    // *** Weather ***
+    // Sun
+    case "Drought": 
+    case "Orichalcum Pulse":
+      fieldEffects.weather = "Sun";
+    break;
+    // Harsh Sunshine
+    case "Desolate Land": 
+      fieldEffects.weather = "Harsh Sunshine";
+    break;
+    // Rain
+    case "Drizzle": 
+      fieldEffects.weather = "Rain";
+    break;
+    // Heavy Rain
+    case "Primordial Sea": 
+      fieldEffects.weather = "Heavy Rain";
+    break;
+    // Sand
+    case "Sand Stream": 
+    case "Sand Spit": 
+      fieldEffects.weather = "Sand";
+    break;
+    // Snow
+    case "Snow Warning": 
+      fieldEffects.weather = "Snow";
+    break;
+    case "Delta Stream": 
+      fieldEffects.weather = "Strong Winds";
+    break;
+    // *** Terrain ***
+    // Electric
+    case "Electric Surge": 
+      fieldEffects.terrain = "Electric";
+    break;
+    // Grassy
+    case "Grassy Surge": 
+      fieldEffects.terrain = "Grassy";
+    break;
+    // Misty
+    case "Misty Surge": 
+      fieldEffects.terrain = "Misty";
+    break;
+    // Psychic
+    case "Psychic Surge": 
+      fieldEffects.terrain = "Psychic";
+    break;
+    // *** Other Effects ***
+    // Beads of Ruin
+    case "Beads of Ruin": 
+      fieldEffects.isBeadsOfRuin = true;
+    break;
+    // Beads of Ruin
+    case "Sword of Ruin": 
+      fieldEffects.isSwordOfRuin = true;
+    break;
+    // Beads of Ruin
+    case "Tablets of Ruin": 
+      fieldEffects.isTabletsOfRuin = true;
+    break;
+    // Beads of Ruin
+    case "Vessel of Ruin": 
+      fieldEffects.isVesselOfRuin = true;
+    break;
+    // Aura Break
+    case "Aura Break": 
+      fieldEffects.isAuraBreak = true;
+    break;
+    // Fairy Aura
+    case "Fairy Aura": 
+      fieldEffects.isFairyAura = true;
+    break;
+    // Dark Aura
+    case "Dark Aura": 
+      fieldEffects.isDarkAura = true;
+    break;
+    // TODO: ???
+  }
+  return fieldEffects;
+}
 
-  // Check for weather
-  const weather = getWeather();
-  if (weather) {
-    field.weather = weather;
+function checkMoveChange(mon, moveName) {
+
+  // Derefernece species
+  const species = mon.name;
+
+  // Zacian, Rusted Sword, Iron Head -> Behemoth B;ade
+  if (species.startsWith("Zacian") && (mon.item === "Rusted Sword") && moveName == "Iron Head") {
+    return "Behemoth Blade"; 
+  }
+  // Zamazenta, Rusted Shield, Iron Head -> Behemoth Bash
+  if (species.startsWith("Zamazenta") && (mon.item === "Rusted Shield") && moveName == "Iron Head") {
+    return "Behemoth Bash"; 
   }
 
-  // Check for terrain
-  const terrain = getTerrain();
-  if (terrain) {
-    field.terrain = terrain;
+  // TODO: ???
+
+  // No change
+  return moveName;
+}
+
+function combineFieldEffects(atkMon, defMon, defaultField, playerEffects, playerAtk = false) {
+
+  // Get mon field effects
+  const atkEffects = getMonFieldEffects(atkMon);
+  const defEffects = getMonFieldEffects(defMon);
+
+  // Order of priority (Most -> Least)
+  // 1: Default (Config Field Effects)
+  // 2: Attacker Field Effects
+  // 3: Defender Field Effects
+
+  // Create main table
+  const fieldEffects = {
+    ...defEffects, 
+    ...atkEffects, 
+    ...defaultField
+  }; 
+
+  // Add player-specific effects
+
+  // Player is attacking
+  if (playerAtk === true) {
+    fieldEffects.attackerSide = playerEffects.player;
+    fieldEffects.defenderSide = playerEffects.opponent;
+  } 
+  else // Player is defending
+  {
+    fieldEffects.attackerSide = playerEffects.opponent;
+    fieldEffects.defenderSide = playerEffects.player;
   }
+
+  return fieldEffects;
+}
+
+function challengeSpecies(mon, usage, options = {}) {
+
+  // Generate the field based on the program config
+  const defaultField = getConfigFieldEffects();
+
+  // Get player-specific field effects
+  const playerEffects = getPlayerEffects();
 
   // Dereference generation
   const gen = mon.gen;
@@ -232,8 +359,18 @@ function challengeSpecies(mon, usage, options) {
 
                 // Defend only NOT set
                 if (!options.defendOnly) {
+
+                  
+
+                  // Combine player, opponent, default effects
+                  const field = new calc.Field(combineFieldEffects(
+                    mon, oppDef, defaultField, playerEffects, true
+                  ));
+
                   // Loop over team moves
-                  for (const moveName of mon.moves) {
+                  for (let moveName of mon.moves) {
+                    // Check if move changes (e.g. Zacian-C and Iron Head)
+                    moveName = checkMoveChange(mon, moveName);
                     const move = new calc.Move(gen, moveName);
                     const result = calc.calculate(gen, mon, oppDef, move, field);
                     if (result.damage != 0) {
@@ -259,13 +396,22 @@ function challengeSpecies(mon, usage, options) {
                   // Counter
                   let moveCount = 0;
 
+                  // Combine player, opponent, default effects
+                  const field = new calc.Field(combineFieldEffects(
+                    oppAtk, mon, defaultField, playerEffects, false
+                  ));
+
                   for (const usageMove of usage.moves) {
                     // Break after limit
                     if (moveCount >= CONFIG.limit.moves)
                       break;
 
                     // Get the name for the move
-                    const moveName = usageMove.option;
+                    let moveName = usageMove.option;
+                    
+                    // Check if move changes (e.g. Zacian-C and Iron Head)
+                    moveName = checkMoveChange(oppAtk, moveName);
+
                     const move = new calc.Move(gen, moveName);
                     const result = calc.calculate(gen, oppAtk, mon, move, field);
                     if (result.damage != 0) {
@@ -313,8 +459,16 @@ function challengeSpecies(mon, usage, options) {
 
                 // Defend only NOT set
                 if (!options.defendOnly) {
+
+                  // Combine player, opponent, default effects
+                  const field = new calc.Field(combineFieldEffects(
+                    mon, opp, defaultField, playerEffects, true
+                  ));
+
                   // Loop over team moves
-                  for (const moveName of mon.moves) {
+                  for (let moveName of mon.moves) {
+                    // Check if move changes (e.g. Zacian-C and Iron Head)
+                    moveName = checkMoveChange(mon, moveName);
                     const move = new calc.Move(gen, moveName);
                     const result = calc.calculate(gen, mon, opp, move, field);
                     if (result.damage != 0) {
@@ -340,6 +494,11 @@ function challengeSpecies(mon, usage, options) {
                   // Counter
                   let moveCount = 0;
 
+                  // Combine player, opponent, default effects
+                  const field = new calc.Field(combineFieldEffects(
+                    opp, mon, defaultField, playerEffects, false
+                  ));
+
                   // Loop over mon moves
                   for (const usageMove of usage.moves) {
                     // Break after limit
@@ -347,7 +506,11 @@ function challengeSpecies(mon, usage, options) {
                       break;
 
                     // Get the name for the move
-                    const moveName = usageMove.option;
+                    let moveName = usageMove.option;
+                                        
+                    // Check if move changes (e.g. Zacian-C and Iron Head)
+                    moveName = checkMoveChange(opp, moveName);
+
                     const move = new calc.Move(gen, moveName);
                     const result = calc.calculate(gen, opp, mon, move, field);
                     if (result.damage != 0) {
@@ -397,12 +560,12 @@ function challengeSpecies(mon, usage, options) {
   return opponents;
 }
 
-function challengeAegislash(monAtk, monDef, usage, field) {
+function challengeAegislash(monAtk, monDef, usage) {
   // Attacking calcs
-  const opponents = challengeSpecies(monAtk, usage, { attackOnly: true, field: field });
+  const opponents = challengeSpecies(monAtk, usage, { attackOnly: true });
 
   // Defensive calcs
-  const defending = challengeSpecies(monDef, usage, { defendOnly: true, field: field });
+  const defending = challengeSpecies(monDef, usage, { defendOnly: true });
 
   // Loop over the opponents
   for (let i = 0; i < opponents.length; i++) {
@@ -414,7 +577,7 @@ function challengeAegislash(monAtk, monDef, usage, field) {
   return opponents;
 }
 
-function calculateTeam(team, usage, format, level = 50, field = 'Doubles') {
+function calculateTeam(team, usage, format, level = 50) {
 
   // Get the 'Generation' object for the format
   const gen = calc.Generations.get(format.gen);
@@ -464,7 +627,7 @@ function calculateTeam(team, usage, format, level = 50, field = 'Doubles') {
             const oppSpecies = speciesUsage.species;
 
             // Run the calcs for the mon against the target species
-            const opponents = challengeAegislash(monAtk, monDef, speciesUsage, field);
+            const opponents = challengeAegislash(monAtk, monDef, speciesUsage);
             calcsTable.opponents[oppSpecies] = opponents;
             monCount++;
           }
@@ -498,7 +661,7 @@ function calculateTeam(team, usage, format, level = 50, field = 'Doubles') {
             const oppSpecies = speciesUsage.species;
 
             // Run the calcs for the mon against the target species
-            const opponents = challengeSpecies(mon, speciesUsage, { field: field });
+            const opponents = challengeSpecies(mon, speciesUsage);
             calcsTable.opponents[oppSpecies] = opponents;
             monCount++;
           }
