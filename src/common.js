@@ -83,18 +83,10 @@ function getThreatTooltip (mon) {
     tooltip += `IVs: ${ivs}\n`;
   }
 
-  /*
-  // Other properties
-  for (const other in set.other) {
-
-    // Create the k/v pair
-    const k = toCapitalCase(other);
-    const v = set.other[other];
-
-    // Add other properties to tooltip
-    tooltip += `${k}: ${v}\n`;
+  // Ability
+  if (mon.ability) {
+    tooltip += `Ability: ${mon.ability}\n`;
   }
-  */
 
   // Tera type
   if (mon["tera type"]) {

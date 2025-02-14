@@ -148,6 +148,7 @@ function getMonFieldEffects (mon) {
     break;
     // *** Terrain ***
     // Electric
+    case "Hadron Engine": 
     case "Electric Surge": 
       fieldEffects.terrain = "Electric";
     break;
