@@ -113,86 +113,86 @@ function moveSortFunc(a, b) {
 
 // mon, oppDef, defaultField, playerEffects
 
-function getMonFieldEffects (mon) {
+function getMonFieldEffects(mon) {
   const fieldEffects = {};
-  switch(mon.ability) {
+  switch (mon.ability) {
     // *** Weather ***
     // Sun
-    case "Drought": 
+    case "Drought":
     case "Orichalcum Pulse":
       fieldEffects.weather = "Sun";
-    break;
+      break;
     // Harsh Sunshine
-    case "Desolate Land": 
+    case "Desolate Land":
       fieldEffects.weather = "Harsh Sunshine";
-    break;
+      break;
     // Rain
-    case "Drizzle": 
+    case "Drizzle":
       fieldEffects.weather = "Rain";
-    break;
+      break;
     // Heavy Rain
-    case "Primordial Sea": 
+    case "Primordial Sea":
       fieldEffects.weather = "Heavy Rain";
-    break;
+      break;
     // Sand
-    case "Sand Stream": 
-    case "Sand Spit": 
+    case "Sand Stream":
+    case "Sand Spit":
       fieldEffects.weather = "Sand";
-    break;
+      break;
     // Snow
-    case "Snow Warning": 
+    case "Snow Warning":
       fieldEffects.weather = "Snow";
-    break;
-    case "Delta Stream": 
+      break;
+    case "Delta Stream":
       fieldEffects.weather = "Strong Winds";
-    break;
+      break;
     // *** Terrain ***
     // Electric
-    case "Hadron Engine": 
-    case "Electric Surge": 
+    case "Hadron Engine":
+    case "Electric Surge":
       fieldEffects.terrain = "Electric";
-    break;
+      break;
     // Grassy
-    case "Grassy Surge": 
+    case "Grassy Surge":
       fieldEffects.terrain = "Grassy";
-    break;
+      break;
     // Misty
-    case "Misty Surge": 
+    case "Misty Surge":
       fieldEffects.terrain = "Misty";
-    break;
+      break;
     // Psychic
-    case "Psychic Surge": 
+    case "Psychic Surge":
       fieldEffects.terrain = "Psychic";
-    break;
+      break;
     // *** Other Effects ***
     // Beads of Ruin
-    case "Beads of Ruin": 
+    case "Beads of Ruin":
       fieldEffects.isBeadsOfRuin = true;
-    break;
+      break;
     // Beads of Ruin
-    case "Sword of Ruin": 
+    case "Sword of Ruin":
       fieldEffects.isSwordOfRuin = true;
-    break;
+      break;
     // Beads of Ruin
-    case "Tablets of Ruin": 
+    case "Tablets of Ruin":
       fieldEffects.isTabletsOfRuin = true;
-    break;
+      break;
     // Beads of Ruin
-    case "Vessel of Ruin": 
+    case "Vessel of Ruin":
       fieldEffects.isVesselOfRuin = true;
-    break;
+      break;
     // Aura Break
-    case "Aura Break": 
+    case "Aura Break":
       fieldEffects.isAuraBreak = true;
-    break;
+      break;
     // Fairy Aura
-    case "Fairy Aura": 
+    case "Fairy Aura":
       fieldEffects.isFairyAura = true;
-    break;
+      break;
     // Dark Aura
-    case "Dark Aura": 
+    case "Dark Aura":
       fieldEffects.isDarkAura = true;
-    break;
+      break;
     // TODO: ???
   }
   return fieldEffects;
@@ -205,11 +205,11 @@ function checkMoveChange(mon, moveName) {
 
   // Zacian, Rusted Sword, Iron Head -> Behemoth B;ade
   if (species.startsWith("Zacian") && (mon.item === "Rusted Sword") && moveName == "Iron Head") {
-    return "Behemoth Blade"; 
+    return "Behemoth Blade";
   }
   // Zamazenta, Rusted Shield, Iron Head -> Behemoth Bash
   if (species.startsWith("Zamazenta") && (mon.item === "Rusted Shield") && moveName == "Iron Head") {
-    return "Behemoth Bash"; 
+    return "Behemoth Bash";
   }
 
   // TODO: ???
@@ -231,10 +231,10 @@ function combineFieldEffects(atkMon, defMon, defaultField, playerEffects, player
 
   // Create main table
   const fieldEffects = {
-    ...defEffects, 
-    ...atkEffects, 
+    ...defEffects,
+    ...atkEffects,
     ...defaultField
-  }; 
+  };
 
   // Add player-specific effects
 
@@ -242,7 +242,7 @@ function combineFieldEffects(atkMon, defMon, defaultField, playerEffects, player
   if (playerAtk === true) {
     fieldEffects.attackerSide = playerEffects.player;
     fieldEffects.defenderSide = playerEffects.opponent;
-  } 
+  }
   else // Player is defending
   {
     fieldEffects.attackerSide = playerEffects.opponent;
@@ -276,7 +276,7 @@ function challengeSpecies(mon, usage, options = {}) {
     if (spreadCount >= CONFIG.limit.spreads) {
       break;
     }
-    
+
     // Counter
     let teraCount = 0;
 
@@ -361,8 +361,6 @@ function challengeSpecies(mon, usage, options = {}) {
                 // Defend only NOT set
                 if (!options.defendOnly) {
 
-                  
-
                   // Combine player, opponent, default effects
                   const field = new calc.Field(combineFieldEffects(
                     mon, oppDef, defaultField, playerEffects, true
@@ -409,7 +407,7 @@ function challengeSpecies(mon, usage, options = {}) {
 
                     // Get the name for the move
                     let moveName = usageMove.option;
-                    
+
                     // Check if move changes (e.g. Zacian-C and Iron Head)
                     moveName = checkMoveChange(oppAtk, moveName);
 
@@ -508,7 +506,7 @@ function challengeSpecies(mon, usage, options = {}) {
 
                     // Get the name for the move
                     let moveName = usageMove.option;
-                                        
+
                     // Check if move changes (e.g. Zacian-C and Iron Head)
                     moveName = checkMoveChange(opp, moveName);
 
@@ -679,4 +677,171 @@ function calculateTeam(team, usage, format, level = 50) {
 
   // Return all calcs
   return totalCalcs;
+}
+
+function getSpeedStr(ivs, evs) {
+
+  // Get the nature data for the spread
+  nature = calc.NATURES[evs.nature];
+
+  // Empty suffix
+  let suffix = '';
+
+  // Non-neutral nature
+  if (nature[0] !== nature[1]) {
+    if (nature[0] === 'spe')
+      suffix = '+'; // Positive
+    else if (nature[1] === 'spe')
+      suffix = '-'; // Negative
+  }
+
+  // Empty iv string
+  let ivStr = '';
+  if (ivs['spe'] !== 31)
+    ivStr = `${ivs['spe']}/`;
+
+  // Return the spread string
+  return `${ivStr}${evs.stats['spe']}${suffix}`;
+}
+
+function getPlayerSpeedStr(ivs, evs, nature) {
+  return getSpeedStr(ivs, {
+    stats: evs, nature: nature
+  });
+}
+
+function getUsageSpreadIVs(evs) {
+  // Get the nature data for the spread
+  const nature = calc.NATURES[evs.nature];
+
+  // Assume 31 ivs by default
+  const ivs = statTemplate(31);
+
+  // Reduced nature
+  if (nature[1] == 'spe') {
+    // Use 0spe
+    ivs.spe = 0;
+  }
+
+  return ivs;
+}
+
+function getPlayerMonSpeedTier(mon) {
+
+  return {
+    level: mon.level,
+    species: mon.species.name,
+    stat: mon.rawStats.spe,
+    base: mon.species.baseStats.spe, 
+    iv: mon.ivs.spe,
+    ev: mon.evs.spe,
+    str: getPlayerSpeedStr(mon.ivs, mon.evs, mon.nature),
+    nature: mon.nature,
+    usage: null
+  }
+}
+
+function getUsageMonSpeedTiers(gen, usage, level = 50) {
+
+  // Indexed on stat
+  const tiers = {};
+
+  // Dereference species data
+  const species = usage.species;
+
+  // Loop over the spreads
+  for (const spread of usage.spreads) {
+    if (spread.option != 'Other') {
+
+      // Get the stats for the spread
+      const evs = getSpread(spread.option);
+
+      const ivs = getUsageSpreadIVs(evs);
+
+      // Generate mon for the spread
+      const mon = new calc.Pokemon(gen, species, {
+        level: level,
+        nature: evs.nature,
+        evs: evs.stats,
+        ivs: ivs
+      });
+
+      // Convert speed stat to raw string
+      const speed = mon.rawStats.spe;
+      const speedStr = `${speed}`;
+
+      // List already contains speed stat
+      if (Object.keys(tiers).includes(speedStr)) {
+        // Update speed usage
+        tiers[speed].usage += spread.usage;
+      }
+      else // Speed stat not in list
+      {
+        tiers[speed] = {
+          level: level,
+          species: species,
+          stat: speed,
+          base: mon.species.baseStats.spe, 
+          iv: ivs['spe'],
+          ev: evs.stats['spe'],
+          str: getSpeedStr(ivs, evs),
+          nature: evs.nature,
+          usage: spread.usage
+        }
+      }
+
+      // Otherwise, skip
+    }
+  }
+
+  // Return tiers (values only)
+  return Object.values(tiers);
+}
+
+function calculateSpeedTiers(team, usage, format, level = 50) {
+
+  // Get the 'Generation' object for the format
+  const gen = calc.Generations.get(format.gen);
+
+  // Total speed calcs
+  const speedTiers = [];
+
+  // Loop over the Pokemon
+  for (const set of team) {
+    // Dereference species
+    const species = set.species;
+
+    // Create the Pokemon object for the set
+    const mon = new calc.Pokemon(gen, species, {
+      level: level,
+      nature: set.nature,
+      evs: set.evs,
+      ability: set.ability,
+      moves: set.moves,
+      item: set.item
+    });
+
+    // Get the speed tier object
+    const tier = getPlayerMonSpeedTier(mon);
+
+    // Add to the speeds
+    speedTiers.push(tier);
+  }
+
+  // Loop over usage mons
+  for (const set of usage) {
+    const tiers = getUsageMonSpeedTiers(gen, set, level);
+
+    // Add to the speeds
+    for(const tier of tiers) {
+      speedTiers.push(tier);
+    }
+  }
+
+  // Sort table via speed stat
+  speedTiers.sort((a,b) => {
+    return b.stat - a.stat
+  });
+
+  return speedTiers;
 }

@@ -20,23 +20,23 @@ function getFormat() {
 
 function getWeather() {
   const weather = document.getElementById('weather-select').value;
-  if (weather === 'none') 
+  if (weather === 'none')
     return undefined;
   return weather;
 }
 
 function getTerrain() {
   const terrain = document.getElementById('terrain-select').value;
-  if (terrain === 'none') 
+  if (terrain === 'none')
     return undefined;
-  return terrain; 
+  return terrain;
 }
 
 function getGameType() {
   return document.getElementById('field-input').value;
 }
 
-function getConfigFieldEffects () {
+function getConfigFieldEffects() {
 
   // Default (Game Type)
   const fieldEffects = {
@@ -58,15 +58,15 @@ function getConfigFieldEffects () {
   // Ruins
 
   // Beads of Ruin
-  const isBeadsOfRuin = (document.getElementById('bor-select').value == 'true'); 
+  const isBeadsOfRuin = (document.getElementById('bor-select').value == 'true');
   if (isBeadsOfRuin) fieldEffects.isBeadsOfRuin = true;
 
   // Sword of Ruin
-  const isSwordOfRuin = (document.getElementById('sor-select').value == 'true'); 
+  const isSwordOfRuin = (document.getElementById('sor-select').value == 'true');
   if (isSwordOfRuin) fieldEffects.isSwordOfRuin = true;
 
   // Tablets of Ruin
-  const isTabletsOfRuin = (document.getElementById('tor-select').value == 'true'); 
+  const isTabletsOfRuin = (document.getElementById('tor-select').value == 'true');
   if (isTabletsOfRuin) fieldEffects.isTabletsOfRuin = true;
 
   // Vessel of Ruin
@@ -76,19 +76,22 @@ function getConfigFieldEffects () {
   return fieldEffects;
 }
 
-function getPlayerEffects () {
+function getPlayerEffects() {
   // Get the value for the screens, reflect drop-downs
   const screens = document.getElementById('screens-select').value;
   const reflect = document.getElementById('reflect-select').value;
+  const tailwind = document.getElementById('tailwind-select').value;
 
   return {
     'player': {
       'isLightScreen': (screens == 'Player' || screens == 'Both'),
       'isReflect': (reflect == 'Player' || reflect == 'Both'),
-    }, 
+      'isTailwind': (tailwind == 'Player' || tailwind == 'Both'),
+    },
     'opponent': {
       'isLightScreen': (screens == 'Opponent' || screens == 'Both'),
       'isReflect': (reflect == 'Opponent' || reflect == 'Both'),
+      'isTailwind': (tailwind == 'Opponent' || tailwind == 'Both'),
     }
   }
 }
@@ -99,9 +102,9 @@ function getFormatInfo(format) {
 
   // Create table
   const table = {
-    'year': parseInt(tokens[0]), 
-    'month': parseInt(tokens[1]), 
-    'format': tokens[2], 
+    'year': parseInt(tokens[0]),
+    'month': parseInt(tokens[1]),
+    'format': tokens[2],
     'rating': parseInt(tokens[3]),
     'gen': 0 // Checked later
   }
@@ -112,17 +115,17 @@ function getFormatInfo(format) {
     const substr = table.format.substring(3);
 
     // Parse Format Generation
-    if (substr[0] == '1') {table.gen = 1}
-    else if (substr[0] == '2') {table.gen = 2}
-    else if (substr[0] == '3') {table.gen = 3}
-    else if (substr[0] == '4') {table.gen = 4}
-    else if (substr[0] == '5') {table.gen = 5}
-    else if (substr[0] == '6') {table.gen = 6}
-    else if (substr[0] == '7') {table.gen = 7}
-    else if (substr[0] == '8') {table.gen = 8}
-    else if (substr[0] == '9') {table.gen = 9}
+    if (substr[0] == '1') { table.gen = 1 }
+    else if (substr[0] == '2') { table.gen = 2 }
+    else if (substr[0] == '3') { table.gen = 3 }
+    else if (substr[0] == '4') { table.gen = 4 }
+    else if (substr[0] == '5') { table.gen = 5 }
+    else if (substr[0] == '6') { table.gen = 6 }
+    else if (substr[0] == '7') { table.gen = 7 }
+    else if (substr[0] == '8') { table.gen = 8 }
+    else if (substr[0] == '9') { table.gen = 9 }
     // Future-proofing
-    else if (substr[0] == '10') {table.gen = 10}
+    else if (substr[0] == '10') { table.gen = 10 }
     else {
       throw Error(`Unhandled generation for format '${format}'!`);
     }
@@ -152,7 +155,7 @@ function getFormatDropdown() {
   }
 }
 
-function showPokemonTable(show=true) {
+function showPokemonTable(show = true) {
   const table = document.getElementById('table-pkmn');
   table.hidden = !show;
 }
@@ -243,7 +246,7 @@ function importShowdown() {
   document.getElementById("table-pkmn-import").innerHTML = ``;
 
   // Update the table
-  update();
+  setTableDamageCalcs();
 
   // Show the Pokemon table
   showPokemonTable(true);
@@ -252,7 +255,7 @@ function importShowdown() {
 function rankingSortFunc(a, b) {
   // Sort method changes depending on 'method' selected
   const method = document.getElementById('sort-input').value;
-  switch(method) {
+  switch (method) {
     // No need to do anything
     case "usage": return 0;
     // Best MU First
@@ -273,26 +276,26 @@ function rankingSortFunc(a, b) {
 }
 
 function getMatchupRanking(table, members, threats) {
-  
+
   // Matchup ranking
   let ranking = {
     // Total matchup val. for whole team
   }
 
   // Loop over the threats
-  for(const threat of threats) {
-    
+  for (const threat of threats) {
+
     // Get the number of sets for the threat
     const sets = table[members[0]].opponents[threat];
 
     // Loop over all of the sets
-    for(const setIndex in sets) {
-      
+    for (const setIndex in sets) {
+
       // Overall threat matchup
       let matchup = 0;
-      
+
       // Loop over the members
-      for(const member of members) {
+      for (const member of members) {
         // Get the matchup data for the member, threat
         const setData = table[member].opponents[threat][setIndex];
 
@@ -330,11 +333,11 @@ function populateTable(table) {
     threats.sort(rankingSortFunc);
 
     // Loop over the threats
-    for(const threat of threats) {
+    for (const threat of threats) {
 
       // Get the number of sets for the threat
       const sets = table[members[0]].opponents[threat];
-      for(const setIndex in sets) {
+      for (const setIndex in sets) {
 
         // Get the set for the threat
         const set = sets[setIndex];
@@ -349,7 +352,7 @@ function populateTable(table) {
         let matchup = 0;
 
         // Loop over the members
-        for(const member of members) {
+        for (const member of members) {
 
           // Get the matchup data for the member, threat
           const setData = table[member].opponents[threat][setIndex];
@@ -369,11 +372,11 @@ function populateTable(table) {
             top.innerHTML = sanitiseMoveDesc(pBestAttack.moveDesc);
             top.setAttribute('data-bs-toggle', 'tooltip');
             top.setAttribute('title', pBestAttack.fullDesc);
-            
+
             // Number of hits to K.O. (Ignore % Chance)
             const nHits = pBestAttack.data.kochance.n;
             top.classList.add(getDamageColour(nHits));
-          } 
+          }
           else // No attack
           {
             // Cannot do any damage
@@ -397,7 +400,7 @@ function populateTable(table) {
             // Number of hits to K.O. (Ignore % Chance)
             const nHits = oBestAttack.data.kochance.n;
             bottom.classList.add(getDamageColour(nHits, true));
-          } 
+          }
           else // No attack
           {
             // Cannot do any damage
@@ -422,8 +425,65 @@ function populateTable(table) {
   }
 }
 
+function populateSpeedTiers(tiers, sets) {
+  // Get the main table for the pokemon
+  const tbody = document.getElementById('tbody-pkmn-main');
+
+  // Dereference column width
+  const colspan = sets.length - 3;
+
+  // Create table header
+  const tr = document.createElement('tr');
+  
+  // Create table contents
+  tr.innerHTML = `
+  <th>Stat</th>
+  <th colspan=${colspan}>Species</th>
+  <th>Base</th>
+  <th>EVs</th>
+  <th>Usage</th>
+  `;
+
+  // Add row to table
+  tbody.appendChild(tr);
+
+  // Loop over all of the tiers
+  for (const tier of tiers) {
+    // Create the threat table rows
+    const tr = document.createElement('tr');
+
+    let usageStr = '-';
+    let youStr = '';
+
+    // Usage provided
+    if (tier.usage) {
+      // Generate usage string (rounded)
+      usageStr = `${Math.floor(tier.usage)}%`;
+    } else {
+      youStr = " (You)";
+    }
+
+    // Create table contents
+    tr.innerHTML = `
+    <td>${tier.stat}</td>
+    <td class='text-left' colspan=${colspan}>${tier.species}${youStr}</td>
+    <td>${tier.base}</td>
+    <td>${tier.str}</td>
+    <td>${usageStr}</td>
+    `;
+
+    // Green background for player mons
+    if (tier.usage === null) {
+      tr.classList.add('verygood');
+    }
+
+    // Add row to table
+    tbody.appendChild(tr);
+  }
+}
+
 // Update the calcs page
-function update(format=null) {
+function update(format = null) {
 
   // No format
   if (!format) {
@@ -442,16 +502,55 @@ function update(format=null) {
 
   // Sets defined
   if (sets) {
-        
     // Clear the table
     clearTable();
-    
-    // Generate the table for the sets, format, level & field
-    const table = calculateTeam(sets, DATA[format], info, level);
 
-    // Populate the pkmn table
-    populateTable(table);
-  } 
+    // Damage Calcs
+    if (document.active) {
+      // Generate the table for the sets, format, level & field
+      const table = calculateTeam(sets, DATA[format], info, level);
+
+      // Populate the pkmn table
+      populateTable(table);
+    }
+    else // Speed Tiers
+    {
+      // Generate the speed tiers table
+      const tiers = calculateSpeedTiers(sets, DATA[format], info, level);
+
+      // Populate speed tiers
+      populateSpeedTiers(tiers, sets);
+    }
+  }
+}
+
+// function setTableDefensive(void): void
+// Called by the web page form to load the defensive
+// table.
+function setTableDamageCalcs() {
+  document.active = 1;
+
+  // Lighten the defensive tab, to show that it is hidden
+  document.getElementById("option-speed").className = "bg-secondary";
+
+  // Darken the offensive tab, to show that it is active
+  document.getElementById("option-damage").className = "bg-dark";
+
+  // Update the form
+  update();
+}
+
+function setTableSpeedTiers() {
+  document.active = 0;
+
+  // Lighten the defensive tab, to show that it is hidden
+  document.getElementById("option-damage").className = "bg-secondary";
+
+  // Darken the offensive tab, to show that it is active
+  document.getElementById("option-speed").className = "bg-dark";
+
+  // Update the form
+  update();
 }
 
 // TODO: Implement calcs document export
@@ -467,7 +566,7 @@ document
     // Add 'import team' form
     document.getElementById("table-pkmn-import").innerHTML = `
   <tr>
-    <td>
+    <td colspan>
       <textarea id='text-import' class='form-control' placeholder='Paste your team here...'></textarea>
     </td>
   </tr>

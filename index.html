@@ -247,6 +247,27 @@
                       </th>
                     </tr>
                     <tr>
+                      <th>
+                        Tailwind
+                      </th>
+                      <th>
+                        <select id="tailwind-select" class="form-control" onchange="update()">
+                          <option value="none" selected>
+                            Default
+                          </option>
+                          <option value="Player">
+                            Player
+                          </option>
+                          <option value="Opponent">
+                            Opponent
+                          </option>
+                          <option value="Both">
+                            Both
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
                       <th colspan="2">
                         Other Effects
                       </th>
@@ -326,6 +347,40 @@
                         </select>
                       </th>
                     </tr>
+                    <tr>
+                      <th colspan=2>
+                        Speed Tiers
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Include Icy Wind
+                      </th>
+                      <th>
+                        <select id="st-iw-select" class="form-control" onchange="update()">
+                          <option value="true">
+                            Yes
+                          </option>
+                          <option value="false" selected>
+                            No
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                      <th class="align-middle">
+                        Include Tailwind
+                      </th>
+                      <th>
+                        <select id="st-tw-select" class="form-control" onchange="update()">
+                          <option value="true">
+                            Yes
+                          </option>
+                          <option value="false" selected>
+                            No
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -366,10 +421,31 @@
                     </tbody>
                   </table>
                   <!-- Un-hidden when team loaded -->
-                  <table id="table-pkmn" class="table table-dark">
+                  <table id="table-pkmn" class="table table-dark" hidden>
                     <thead>
+                      <tr id="tr-pkmn-switch">
+                        <th id="option-damage" class="" scope="col">
+                          <a
+                            class="text-light"
+                            href="#"
+                            onClick="setTableDamageCalcs()"
+                          >
+                            Damage
+                          </a>
+                        </th>
+      
+                        <th id="option-speed" class="" scope="col">
+                          <a
+                            class="text-light"
+                            href="#"
+                            onClick="setTableSpeedTiers()"
+                          >
+                            Speed
+                          </a>
+                        </th>
+                      </tr>
                       <tr id="tr-pkmn-head">
-                        <th class="align-middle" hidden>
+                        <th class="align-middle">
                           brmt :)
                         </th>
                         <!-- Populated by sprites -->
