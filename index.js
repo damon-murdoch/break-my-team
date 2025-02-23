@@ -36,6 +36,36 @@ function getGameType() {
   return document.getElementById('field-input').value;
 }
 
+function getSpeedTierConfig() {
+
+  // Sorting Method
+  const sortBy = document.getElementById('sort-speed').value;
+
+  // Items
+  const itemEffects = document.getElementById('ie-select').value;
+  const abilityEffects = document.getElementById('ae-select').value;
+
+  // Field Effects
+  const tailwind = document.getElementById('tw-select').value;
+  const icyWind = document.getElementById('tw-select').value;
+
+  return {
+    'sort': sortBy,
+    'player': {
+      'abilityEffects': (abilityEffects == 'Player' || abilityEffects == 'Both'),
+      'itemEffects': (itemEffects == 'Player' || itemEffects == 'Both'),
+      'tailwind': (tailwind == 'Player' || tailwind == 'Both'),
+      'icyWind': (icyWind == 'Player' || icyWind == 'Both')
+    },
+    'other': {
+      'abilityEffects': (abilityEffects == 'Opponent' || abilityEffects == 'Both'),
+      'itemEffects': (itemEffects == 'Opponent' || itemEffects == 'Both'),
+      'tailwind': (tailwind == 'Opponent' || tailwind == 'Both'),
+      'icyWind': (icyWind == 'Opponent' || icyWind == 'Both')
+    }
+  }
+}
+
 function getConfigFieldEffects() {
 
   // Default (Game Type)
@@ -80,18 +110,15 @@ function getPlayerEffects() {
   // Get the value for the screens, reflect drop-downs
   const screens = document.getElementById('screens-select').value;
   const reflect = document.getElementById('reflect-select').value;
-  const tailwind = document.getElementById('tailwind-select').value;
 
   return {
     'player': {
       'isLightScreen': (screens == 'Player' || screens == 'Both'),
-      'isReflect': (reflect == 'Player' || reflect == 'Both'),
-      'isTailwind': (tailwind == 'Player' || tailwind == 'Both'),
+      'isReflect': (reflect == 'Player' || reflect == 'Both')
     },
     'opponent': {
       'isLightScreen': (screens == 'Opponent' || screens == 'Both'),
-      'isReflect': (reflect == 'Opponent' || reflect == 'Both'),
-      'isTailwind': (tailwind == 'Opponent' || tailwind == 'Both'),
+      'isReflect': (reflect == 'Opponent' || reflect == 'Both')
     }
   }
 }
@@ -430,23 +457,25 @@ function populateSpeedTiers(tiers, sets) {
   const tbody = document.getElementById('tbody-pkmn-main');
 
   // Dereference column width
-  const colspan = sets.length - 3;
+  const colspan = sets.length - 4;
 
   // Create table header
   const tr = document.createElement('tr');
-  
+
   // Create table contents
   tr.innerHTML = `
+  <th>Ranking</th>
   <th>Stat</th>
   <th colspan=${colspan}>Species</th>
   <th>Base</th>
-  <th>EVs</th>
+  <th>Spread</th>
   <th>Usage</th>
   `;
 
   // Add row to table
   tbody.appendChild(tr);
 
+  let i = 1;
   // Loop over all of the tiers
   for (const tier of tiers) {
     // Create the threat table rows
@@ -454,27 +483,39 @@ function populateSpeedTiers(tiers, sets) {
 
     let usageStr = '-';
     let youStr = '';
+    let modStr = '';
 
     // Usage provided
     if (tier.usage) {
       // Generate usage string (rounded)
       usageStr = `${Math.floor(tier.usage)}%`;
     } else {
-      youStr = " (You)";
+      youStr = " (Your Set)";
+    }
+
+    // Ability provided
+    if (tier.mod) {
+      modStr = ` (${tier.mod})`;
     }
 
     // Create table contents
     tr.innerHTML = `
-    <td>${tier.stat}</td>
-    <td class='text-left' colspan=${colspan}>${tier.species}${youStr}</td>
-    <td>${tier.base}</td>
-    <td>${tier.str}</td>
-    <td>${usageStr}</td>
+    <td width='16.6%'>#${i++}</td>
+    <td width='16.6%'>${tier.stat}</td>
+    <td width='33.2%' class='text-left' colspan=${colspan}>${tier.species}${youStr}${modStr}</td>
+    <td width='16.6%'>${tier.base}</td>
+    <td width='16.6%'>${getSpeedStr(tier)}</td>
+    <td width='16.6%'>${usageStr}</td>
     `;
 
-    // Green background for player mons
     if (tier.usage === null) {
+      // Green bg for player mons
       tr.classList.add('verygood');
+    }
+
+    else if (modStr) {
+      // Yellow bg for boosted mons
+      tr.classList.add('neutral');
     }
 
     // Add row to table
@@ -530,6 +571,10 @@ function update(format = null) {
 function setTableDamageCalcs() {
   document.active = 1;
 
+  // Show the damage options menu, hide the speed options menu
+  document.getElementById('table-damage-options').hidden = '';
+  document.getElementById('table-speed-options').hidden = 'hidden';
+
   // Lighten the defensive tab, to show that it is hidden
   document.getElementById("option-speed").className = "bg-secondary";
 
@@ -542,6 +587,10 @@ function setTableDamageCalcs() {
 
 function setTableSpeedTiers() {
   document.active = 0;
+
+  // Hide the damage options menu, show the speed options menu
+  document.getElementById('table-damage-options').hidden = 'hidden';
+  document.getElementById('table-speed-options').hidden = '';
 
   // Lighten the defensive tab, to show that it is hidden
   document.getElementById("option-damage").className = "bg-secondary";

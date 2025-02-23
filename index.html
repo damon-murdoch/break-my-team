@@ -79,8 +79,6 @@
                         Format
                       </th>
                     </tr>
-                  </thead>
-                  <tbody>
                     <tr>
                       <th colspan=2>
                         <select class="form-control" id="fmt-select" onChange="update(value)">
@@ -93,6 +91,16 @@
                         Options
                       </th>
                     </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Level
+                      </th>
+                      <th>
+                        <input id="lvl-input" class="form-control" type="number" min="1" max="100" value="50" onchange="update()">
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-damage-options">
                     <tr>
                       <th class="align-middle">
                         Sort By
@@ -110,14 +118,6 @@
                           </option>
                         </select>
                       </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Level
-                      </th>
-                      <td>
-                        <input id="lvl-input" class="form-control" type="number" min="1" max="100" value="50" onchange="update()">
-                      </td>
                     </tr>
                     <tr>
                       <th class="align-middle">
@@ -247,27 +247,6 @@
                       </th>
                     </tr>
                     <tr>
-                      <th>
-                        Tailwind
-                      </th>
-                      <th>
-                        <select id="tailwind-select" class="form-control" onchange="update()">
-                          <option value="none" selected>
-                            Default
-                          </option>
-                          <option value="Player">
-                            Player
-                          </option>
-                          <option value="Opponent">
-                            Opponent
-                          </option>
-                          <option value="Both">
-                            Both
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
                       <th colspan="2">
                         Other Effects
                       </th>
@@ -347,36 +326,108 @@
                         </select>
                       </th>
                     </tr>
-                    <tr>
-                      <th colspan=2>
-                        Speed Tiers
-                      </th>
-                    </tr>
+                  </tbody>
+                  <tbody id="table-speed-options">
                     <tr>
                       <th class="align-middle">
-                        Include Icy Wind
+                        Sort By
                       </th>
                       <th>
-                        <select id="st-iw-select" class="form-control" onchange="update()">
-                          <option value="true">
-                            Yes
+                        <select id="sort-speed" class="form-control" onchange="update()">
+                          <option value="fast" selected>
+                            Fastest First
                           </option>
-                          <option value="false" selected>
-                            No
+                          <option value="slow">
+                            Slowest First
                           </option>
                         </select>
                       </th>
                     </tr>
-                      <th class="align-middle">
-                        Include Tailwind
+                    <tr>
+                      <th colspan=2>
+                        Player Effects
+                      </th>
+                    </tr>
+                    <tr>
+                      <th>
+                        Item Effects
                       </th>
                       <th>
-                        <select id="st-tw-select" class="form-control" onchange="update()">
-                          <option value="true">
-                            Yes
+                        <select id="ie-select" class="form-control" onchange="update()">
+                          <option value="none">
+                            Hide Both
                           </option>
-                          <option value="false" selected>
-                            No
+                          <option value="Player">
+                            Show Player
+                          </option>
+                          <option value="Opponent">
+                            Show Others
+                          </option>
+                          <option value="Both" selected>
+                            Show Both
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th>
+                        Ability Effects
+                      </th>
+                      <th>
+                        <select id="ae-select" class="form-control" onchange="update()">
+                          <option value="none">
+                            Hide Both
+                          </option>
+                          <option value="Player">
+                            Show Player
+                          </option>
+                          <option value="Opponent">
+                            Show Others
+                          </option>
+                          <option value="Both" selected>
+                            Show Both
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th>
+                        Tailwind
+                      </th>
+                      <th>
+                        <select id="tw-select" class="form-control" onchange="update()">
+                          <option value="none" selected>
+                            Hide Both
+                          </option>
+                          <option value="Player">
+                            Show Player
+                          </option>
+                          <option value="Opponent">
+                            Show Others
+                          </option>
+                          <option value="Both">
+                            Show Both
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Icy Wind
+                      </th>
+                      <th>
+                        <select id="iw-select" class="form-control" onchange="update()">
+                          <option value="none" selected>
+                            Hide Both
+                          </option>
+                          <option value="Player">
+                            Show Player
+                          </option>
+                          <option value="Opponent">
+                            Show Others
+                          </option>
+                          <option value="Both">
+                            Show Both
                           </option>
                         </select>
                       </th>
