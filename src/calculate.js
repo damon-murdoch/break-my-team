@@ -720,6 +720,10 @@ function getUsageSpreadIVs(evs) {
   return ivs;
 }
 
+function checkProtoSpeedBoost(rawStats) {
+  return (rawStats.spe > rawStats.atk) && (rawStats.spe > rawStats.def) && (rawStats.spe > rawStats.spa) && (rawStats.spe > rawStats.spd);
+}
+
 function applyStageMultiplier(stat, stage) {
   // Lowered
   if (stage < 0)
@@ -733,98 +737,128 @@ function applyStageMultiplier(stat, stage) {
   return Math.floor(stat);
 }
 
-function checkProtoSpeedBoost(rawStats) {
-  return (rawStats.spe > rawStats.atk) && (rawStats.spe > rawStats.def) && (rawStats.spe > rawStats.spa) && (rawStats.spe > rawStats.spd);
-}
-
-function checkSpeedTierItem(mon, template) {
+function checkSpeedTierItem(template) {
   // Default
-  let copy = null;
+  const copies = [];
 
-  // Boost stage
-  let stage = 0;
+  // Loop over the items
+  for(const item of template.item) {
+    // Boost stage
+    let stage = 0;
 
-  switch (mon.item) {
-    case 'Booster Energy': {
-      // Proto already used, or proto boost not speed
-      if (mon.rawStats && checkProtoSpeedBoost(mon.rawStats))
-        stage += 1;
-    }; break;
-    case 'Choice Scarf': {
-      stage += 1;
-    }; break;
-    default: {
-      // Do nothing
-    }; break;
+    // Switch on the item
+    switch (item) {
+      case 'Booster Energy': {
+        // Proto speed boost
+        if (template.proto)
+          stage += 1;
+      }; break;
+      case 'Choice Scarf': {
+        console.log(template.ev, CONFIG.scarf);
+        if (template.ev > CONFIG.scarf)
+          stage += 1;
+      }; break;
+      default: {
+        // Do nothing
+      }; break;
+    }
+
+    // Stage modified
+    if (stage != 0) {
+      // Create a deep copy of the template
+      copy = JSON.parse(JSON.stringify(template));
+
+      // Apply the stat change
+      copy.stat = applyStageMultiplier(copy.stat, stage);
+
+      // Update other fields
+      copy.mod = item;
+      copy.stage = stage;
+
+      // Add to the copies
+      copies.push(copy);
+    }
   }
 
-  // Stage modified
-  if (stage != 0) {
-    // Create a deep copy of the template
-    copy = JSON.parse(JSON.stringify(template));
-
-    // Apply the stat change
-    copy.stat = applyStageMultiplier(copy.stat, stage);
-
-    // Update other fields
-    copy.mod = mon.item;
-    copy.stage = stage;
-  }
-
-  return copy;
+  // Return copies
+  return copies;
 }
 
-function checkSpeedTierAbility(mon, template) {
+function checkSpeedTierAbility(template) {
   // Default
-  let copy = null;
+  const copies = [];
 
-  // Boost stage
-  let stage = 0;
+  // Loop over the abilities
+  for(const ability of template.ability) {
+      
+    // Boost stage
+    let stage = 0;
+
+    switch (ability) {
+      case 'Protosynthesis':
+      case 'Quark Drive': {
+        // Check to see if the Pokemon is holding booster energy or not
+        const hasBoosterEnergy = template.item.includes('Booster Energy');
+        // Proto speed boost
+        if (template.proto && !hasBoosterEnergy)
+          stage += 1;
+      }; break;
+      // Weather Boost
+      case 'Swift Swim':
+      case 'Chlorophyll':
+      case 'Sand Rush':
+      case 'Slush Rush':
+      // Other Boost
+      case 'Unburden': {
+        // 2 more stages 
+        stage += 2;
+      }; break;
+    }
   
-  switch (mon.ability) {
-    case 'Protosynthesis':
-    case 'Quark Drive': {
-      if (mon.rawStats && checkProtoSpeedBoost(mon.rawStats))
-        stage += 1;
-    }; break;
-    // Weather Boost
-    case 'Swift Swim':
-    case 'Chlorophyll':
-    case 'Sand Rush':
-    case 'Slush Rush':
-    // Other Boost
-    case 'Unburden': {
-      // 2 more stages 
-      stage += 2;
-    }; break;
+    // Stage modified
+    if (stage != 0) {
+      // Create a deep copy of the template
+      copy = JSON.parse(JSON.stringify(template));
+  
+      // Apply the stat change
+      copy.stat = applyStageMultiplier(copy.stat, stage);
+  
+      // Update other fields
+      copy.mod = ability;
+      copy.stage = stage;
+      
+      // Add to the copies
+      copies.push(copy);
+    }
   }
 
-  // Stage modified
-  if (stage != 0) {
-    // Create a deep copy of the template
-    copy = JSON.parse(JSON.stringify(template));
-
-    // Apply the stat change
-    copy.stat = applyStageMultiplier(copy.stat, stage);
-
-    // Update other fields
-    copy.mod = mon.ability;
-    copy.stage = stage;
-  }
-
-  // Return copy set
-  return copy;
+  // Return copies
+  return copies;
 }
 
-function getPlayerMonSpeedTiers(mon, config) {
+function applySpeedTierModifiers(tiers, config) {
+  let tierCount = tiers.length;
+  for(let i=0; i<tierCount; i++) {
+    const template = tiers[i];
+    // Ability effects enabled
+    if (config.ability) {
+      const copies = checkSpeedTierAbility(template);
+      tiers = tiers.concat(copies);
+    }
 
-  // List of mons
-  // Usually just 1, but adds 2 for 
-  // booster energy / tailwind / etc.
-  const tiers = [];
+    // Item effects enabled
+    if (config.item) {
+      const copies = checkSpeedTierItem(template);
+      tiers = tiers.concat(copies);
+    }
+  }
+  return tiers;
+}
+
+function getPlayerMonSpeedTiers(mon) {
 
   // Speed tier data
-  const template = {
+  return [{
     level: mon.level,
     species: mon.species.name,
     stat: mon.rawStats.spe,
@@ -833,46 +867,18 @@ function getPlayerMonSpeedTiers(mon, config) {
     ev: mon.evs.spe,
     stage: 0, // Neutral
     nature: mon.nature,
-    ability: mon.ability,
+    ability: [mon.ability],
+    proto: checkProtoSpeedBoost(mon.rawStats),
     usage: null,
-    item: mon.item,
+    item: [mon.item],
     mod: null,
-  }
-
-  // Booster not used
-  let booster = true;
-
-  // Ability effects enabled
-  if (config.abilityEffects) {
-    const copy = checkSpeedTierAbility(mon, template);
-    if (copy) {
-      if (copy.ability === 'Quark Drive' || copy.ability === 'Protosynthesis')
-        booster = false;
-      tiers.push(copy);
-    }
-  }
-
-  // Item effects enabled
-  if (config.itemEffects) {
-    const copy = checkSpeedTierItem(mon, template);
-    if (copy) {
-      // Skip if proto/quark, and booster already used
-      if (!((!booster) && copy.item === 'Booster Energy'))
-        tiers.push(copy);
-    }
-  }
-
-  // Add base to list
-  tiers.push(template);
-
-  // Return list
-  return tiers;
+  }];
 }
 
-function getUsageMonSpeedTiers(gen, usage, level, config) {
+function getUsageMonSpeedTiers(gen, usage, level) {
 
   // Indexed on stat
-  const indexes = {};
+  const tiers = {};
 
   // Dereference species data
   const species = usage.species;
@@ -881,9 +887,8 @@ function getUsageMonSpeedTiers(gen, usage, level, config) {
   for (const spread of usage.spreads) {
     if (spread.option != 'Other') {
 
-      // Get the stats for the spread
+      // Dereference ivs/evs
       const evs = getSpread(spread.option);
-
       const ivs = getUsageSpreadIVs(evs);
 
       // Generate mon for the spread
@@ -899,13 +904,17 @@ function getUsageMonSpeedTiers(gen, usage, level, config) {
       const speedStr = `${speed}`;
 
       // List already contains speed stat
-      if (Object.keys(indexes).includes(speedStr)) {
+      if (Object.keys(tiers).includes(speedStr)) {
         // Update speed usage
-        indexes[speed].usage += spread.usage;
+        tiers[speed].usage += spread.usage;
+
+        // If at least one set gets the proto boost, set proto to true
+        if (tiers[speed].proto === false && checkProtoSpeedBoost(mon.rawStats))
+          tiers[speed].proto = true;
       }
       else // Speed stat not in list
       {
-        indexes[speed] = {
+        tiers[speed] = {
           level: level,
           species: species,
           stat: speed,
@@ -913,52 +922,18 @@ function getUsageMonSpeedTiers(gen, usage, level, config) {
           iv: ivs['spe'],
           ev: evs.stats['spe'],
           nature: evs.nature,
-          ability: mon.ability,
+          ability: usage.abilities.filter(x => x.usage > CONFIG.usage.ability).map(x => x.option),
+          proto: checkProtoSpeedBoost(mon.rawStats),
           usage: spread.usage,
-          item: mon.item,
+          item: usage.items.filter(x => x.usage > CONFIG.usage.item).map(x => x.option),
           mod: null,
         }
       }
     }
   }
 
-  // Get tiers (values only)
-  const tiers = Object.values(indexes);
-  const tierCount = tiers.length;
-
-  for(let i=0; i<tierCount; i++) {
-
-    // Dereference index
-    const template = tiers[i];
-
-    // Booster not used
-    let booster = true;
-
-    // Ability effects enabled
-    if (config.abilityEffects) {
-      const copy = checkSpeedTierAbility(template, template);
-      if (copy) {
-        const newSpeedStr = `${copy.stat}`;
-        if (Object.keys(indexes).includes(newSpeedStr)) {
-          if (copy.ability === 'Quark Drive' || copy.ability === 'Protosynthesis')
-            booster = false;
-          indexes.push(copy);
-        }
-      }
-    }
-
-    // Item effects enabled
-    if (config.itemEffects) {
-      const copy = checkSpeedTierItem(template, template);
-      if (copy) {
-        // Skip if proto/quark, and booster already used
-        if (!((!booster) && copy.item === 'Booster Energy'))
-          indexes.push(copy);
-      }
-    }
-  }
-
-  return tiers;
+  // Return tiers without keys
+  return Object.values(tiers);
 }
 
 function calculateSpeedTiers(team, usage, format, level = 50) {
@@ -988,7 +963,7 @@ function calculateSpeedTiers(team, usage, format, level = 50) {
     });
 
     // Get the speed tier object
-    const tiers = getPlayerMonSpeedTiers(mon, config.player);
+    const tiers = applySpeedTierModifiers(getPlayerMonSpeedTiers(mon), config.player);
 
     // Add to the speeds
     for (const tier of tiers) {
@@ -996,14 +971,22 @@ function calculateSpeedTiers(team, usage, format, level = 50) {
     }
   }
 
+  let monCount = 0;
   // Loop over usage mons
   for (const set of usage) {
-    const tiers = getUsageMonSpeedTiers(gen, set, level, config.other);
+    
+    // Break after limit
+    if (monCount > CONFIG.limit.mons)
+      break;
+
+    const tiers = applySpeedTierModifiers(getUsageMonSpeedTiers(gen, set, level), config.other);
 
     // Add to the speeds
     for (const tier of tiers) {
       speedTiers.push(tier);
     }
+
+    monCount++;
   }
 
   // Sort table via speed stat

@@ -42,26 +42,18 @@ function getSpeedTierConfig() {
   const sortBy = document.getElementById('sort-speed').value;
 
   // Items
-  const itemEffects = document.getElementById('ie-select').value;
-  const abilityEffects = document.getElementById('ae-select').value;
-
-  // Field Effects
-  const tailwind = document.getElementById('tw-select').value;
-  const icyWind = document.getElementById('tw-select').value;
+  const item = document.getElementById('ie-select').value;
+  const ability = document.getElementById('ae-select').value;
 
   return {
-    'sort': sortBy,
-    'player': {
-      'abilityEffects': (abilityEffects == 'Player' || abilityEffects == 'Both'),
-      'itemEffects': (itemEffects == 'Player' || itemEffects == 'Both'),
-      'tailwind': (tailwind == 'Player' || tailwind == 'Both'),
-      'icyWind': (icyWind == 'Player' || icyWind == 'Both')
+    sort: sortBy,
+    player: {
+      ability: (ability == 'Player' || ability == 'Both'),
+      item: (item == 'Player' || item == 'Both')
     },
-    'other': {
-      'abilityEffects': (abilityEffects == 'Opponent' || abilityEffects == 'Both'),
-      'itemEffects': (itemEffects == 'Opponent' || itemEffects == 'Both'),
-      'tailwind': (tailwind == 'Opponent' || tailwind == 'Both'),
-      'icyWind': (icyWind == 'Opponent' || icyWind == 'Both')
+    other: {
+      ability: (ability == 'Opponent' || ability == 'Both'),
+      item: (item == 'Opponent' || item == 'Both')
     }
   }
 }
@@ -460,22 +452,21 @@ function populateSpeedTiers(tiers, sets) {
   const colspan = sets.length - 4;
 
   // Create table header
-  const tr = document.createElement('tr');
+  const trhead = document.createElement('tr');
 
   // Create table contents
-  tr.innerHTML = `
-  <th>Ranking</th>
-  <th>Stat</th>
-  <th colspan=${colspan}>Species</th>
-  <th>Base</th>
-  <th>Spread</th>
-  <th>Usage</th>
+  trhead.innerHTML = `
+  <th class='align-middle'>Species</th>
+  <th class='align-middle'>Stat</th>
+  <th class='align-middle' colspan=${colspan}>Modifier</th>
+  <th class='align-middle'>Base</th>
+  <th class='align-middle'>Spread</th>
+  <th class='align-middle'>Usage</th>
   `;
 
   // Add row to table
-  tbody.appendChild(tr);
+  tbody.appendChild(trhead);
 
-  let i = 1;
   // Loop over all of the tiers
   for (const tier of tiers) {
     // Create the threat table rows
@@ -495,27 +486,35 @@ function populateSpeedTiers(tiers, sets) {
 
     // Ability provided
     if (tier.mod) {
-      modStr = ` (${tier.mod})`;
+      modStr = `${tier.mod}`;
     }
+
+    // Get item sprite
+    let item=null;
+    if (tier.item.includes(tier.mod)) {
+      item = itemString(tier.mod);
+    }
+
+    // Sanitise the pokemon name
+    const species = sanitiseString(tier.species);
+
+    // Get the sprite string for the species, item
+    const sprite = getSpriteString(species, item);
 
     // Create table contents
     tr.innerHTML = `
-    <td width='16.6%'>#${i++}</td>
-    <td width='16.6%'>${tier.stat}</td>
-    <td width='33.2%' class='text-left' colspan=${colspan}>${tier.species}${youStr}${modStr}</td>
-    <td width='16.6%'>${tier.base}</td>
-    <td width='16.6%'>${getSpeedStr(tier)}</td>
-    <td width='16.6%'>${usageStr}</td>
+    ${sprite}
+    <td class='align-middle' width='16.6%'>${tier.stat}</td>
+    <td class='align-middle' width='33.2%' colspan=${colspan}>${modStr}${youStr}</td>
+    <td class='align-middle' width='16.6%'>${tier.base}</td>
+    <td class='align-middle' width='16.6%'>${getSpeedStr(tier)}</td>
+    <td class='align-middle' width='16.6%'>${usageStr}</td>
     `;
 
+    // No usage stats (player mon)
     if (tier.usage === null) {
       // Green bg for player mons
       tr.classList.add('verygood');
-    }
-
-    else if (modStr) {
-      // Yellow bg for boosted mons
-      tr.classList.add('neutral');
     }
 
     // Add row to table

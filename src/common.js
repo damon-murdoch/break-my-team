@@ -153,7 +153,7 @@ function getMonTooltip (set) {
   return tooltip;
 }
 
-function getSpriteString(species, item, tooltip = null) {
+function getSpriteString(species, item = null, tooltip = null) {
 
   // Tool tip html code
   let tooltipHtml = "";
@@ -162,18 +162,16 @@ function getSpriteString(species, item, tooltip = null) {
     tooltipHtml = ` data-bs-toggle="tooltip" title="${tooltip}"`;
   }
 
+  // Item html code
+  let itemHtml = "";
+  if (item !== null) {
+    itemHtml = `<img src="img/item/${item}.png" style="position: absolute; bottom: 0; right: 0; width: 25%; height: auto;">`;
+  }
+
   return `
-  <th 
-    style="position: relative;"${tooltipHtml}
-  >
+  <th style="position: relative;"${tooltipHtml}>
     <img src="img/box/${species}.png" style="width: 100%; height: auto;">
-    <img src="img/item/${item}.png" style="
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 25%; /* Adjust size as needed */
-      height: auto;
-    ">
+    ${itemHtml}
   </th>`;
 }
 
