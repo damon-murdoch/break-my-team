@@ -391,6 +391,91 @@
                       </th>
                     </tr>
                   </tbody>
+                  <tbody id="table-report-options">
+                    <tr>
+                      <th class="align-middle">
+                        Team Name
+                      </th>
+                      <th>
+                        <input id="team-name" class="form-control" value="My Team" onchange="update()">
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Team Author
+                      </th>
+                      <th>
+                        <input id="team-author" class="form-control" value="Me" onchange="update()">
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Table of Contents
+                      </th>
+                      <th>
+                        <select id="include-toc" class="form-control" onchange="update()">
+                          <option value="include" selected>
+                            Include
+                          </option>
+                          <option value="exclude">
+                            Exclude
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Team Paste
+                      </th>
+                      <th>
+                        <select id="include-paste" class="form-control" onchange="update()">
+                          <option value="include" selected>
+                            Include
+                          </option>
+                          <option value="exclude">
+                            Exclude
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Speed Tiers
+                      </th>
+                      <th>
+                        <select id="include-speed" class="form-control" onchange="update()">
+                          <option value="include" selected>
+                            Include
+                          </option>
+                          <option value="exclude">
+                            Exclude
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Damage Calcs
+                      </th>
+                      <th>
+                        <select id="include-damage" class="form-control" onchange="update()">
+                          <option value="include" selected>
+                            Include
+                          </option>
+                          <option value="exclude">
+                            Exclude
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th colspan="2">
+                        <a class="btn btn-secondary" href="#" onClick="copyReport()">
+                          Copy To Clipboard
+                        </a>
+                      </th>
+                    </tr>
+                  </tbody>
                 </table>
               </div>
               <div
@@ -442,7 +527,6 @@
                             Damage
                           </a>
                         </th>
-      
                         <th id="option-speed" class="" scope="col">
                           <a
                             class="text-light"
@@ -450,6 +534,15 @@
                             onClick="setTableSpeedTiers()"
                           >
                             Speed
+                          </a>
+                        </th>
+                        <th id="option-report" class="" scope="col">
+                          <a
+                            class="text-light"
+                            href="#"
+                            onClick="setPageReport()"
+                          >
+                            Report
                           </a>
                         </th>
                       </tr>
@@ -475,12 +568,12 @@
       <!-- JavaScript Source -->
 
       <!-- Pokemon Data Layer -->
-      <!-- TODO: Local copy of this! -->
-      <script src="https://unpkg.com/@smogon/calc/dist/data/production.min.js"></script>
+      <!-- <script src="https://unpkg.com/@smogon/calc/dist/data/production.min.js"></script> -->
+      <script src="dist/data.min.js"></script>
 
       <!-- Pokemon Calcs Library -->
-      <!-- TODO: Local copy of this! -->
-      <script src="https://unpkg.com/@smogon/calc"></script>
+      <!-- <script src="https://unpkg.com/@smogon/calc"></script> -->
+      <script src="dist/calc.min.js"></script>
 
       <!-- Program Calculation Library -->
       <script src="src/calculate.js"></script>
@@ -493,6 +586,9 @@
 
       <!-- Program Config Script -->
       <script src="src/config.js"></script>
+
+      <!-- Forme Change Data Set -->
+      <script src="src/formes.js"></script>
 
       <!-- Data Source Library -->
       <script src="data/data.js"></script>

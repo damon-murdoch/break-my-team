@@ -38,6 +38,7 @@ function itemString (str) {
   
   // Remove missing sprite suffixes
   itemStr = itemStr.replace('-berry', '');
+  itemStr = itemStr.replace('-plate', '');
   itemStr = itemStr.replace('-ball', '');
 
   return itemStr;
@@ -45,12 +46,13 @@ function itemString (str) {
 
 function getDamageColour(n, incoming=false) {
   switch(n) {
-    case 0: // Cannot KO, Flow over
     case 1: return incoming ? 'verybad': 'verygood'; 
     case 2: return incoming ? 'bad' : 'good'; 
     case 3: return 'neutral';
     case 4: return incoming ? 'good' : 'bad'; 
-    default: return incoming ? 'verygood' : 'verybad'; 
+    case 0: // Cannot KO, Flow over
+    default: 
+      return incoming ? 'verygood' : 'verybad'; 
   }
 }
 
@@ -117,6 +119,12 @@ function getMonTooltip (set) {
   // Tooltip Text (e.g. Urshifu @ Focus Sash)
   let tooltip = `${set.species} @ ${set.item}\n`;
 
+  // Add ability (if provided)
+  const ability = set.ability;
+  if (ability) {
+    tooltip += `Ability: ${ability}\n`;
+  }
+
   // Add EVs (If provided)
   const evs = getStatString(set.evs);
   if (evs) {
@@ -153,7 +161,7 @@ function getMonTooltip (set) {
   return tooltip;
 }
 
-function getSpriteString(species, item = null, tooltip = null) {
+function getSpriteString(species, item = null, tooltip = null, id = null) {
 
   // Tool tip html code
   let tooltipHtml = "";
@@ -168,8 +176,14 @@ function getSpriteString(species, item = null, tooltip = null) {
     itemHtml = `<img src="img/item/${item}.png" style="position: absolute; bottom: 0; right: 0; width: 25%; height: auto;">`;
   }
 
+  // Element id code
+  let idHtml = "";
+  if (id !== null) {
+    idHtml = `id='${id}'`;
+  }
+
   return `
-  <th style="position: relative;"${tooltipHtml}>
+  <th ${idHtml} style="position: relative;"${tooltipHtml}>
     <img src="img/box/${species}.png" style="width: 100%; height: auto;">
     ${itemHtml}
   </th>`;

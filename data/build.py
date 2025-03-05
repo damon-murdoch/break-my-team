@@ -57,26 +57,21 @@ parser.add_argument(
     help=f"If set, automatically rebuilds the data.js and data.json files with the new data."
 )
 
-
-# Main script running directly
-if __name__ == "__main__":
-
-    # Parse the function params
-    args = parser.parse_args()
-
-    print("Building .json files ...")
+def build_json(months, formats, ratings, url = "https://www.smogon.com/stats/[month]/moveset"):
 
     # Loop over the months
-    for month in args.month:
-
+    for month in months:
+        
         # Generate the url, substituting the month
-        url = args.url.replace("[month]", month)
+        month_url = url.replace("[month]", month)
+
+        print(month_url)
 
         # Loop over the formats
-        for format in args.format:
+        for format in formats:
 
             # Loop over the ratings
-            for rating in args.rating:
+            for rating in ratings:
 
                 # Placeholder
                 data = None
@@ -94,7 +89,7 @@ if __name__ == "__main__":
                 if not os.path.exists(local):
 
                     # Generate the url path
-                    urlpath = f"{url}/{filename}"
+                    urlpath = f"{month_url}/{filename}"
                 
                     print(f"Downloading file '{urlpath}' ...")
 
@@ -127,6 +122,18 @@ if __name__ == "__main__":
                 else: # Failed to read data
                     raise Exception(f"Failed to read data from file '{local}'!")
                 
+
+
+# Main script running directly
+if __name__ == "__main__":
+
+    # Parse the function params
+    args = parser.parse_args()
+
+    print("Building .json files ...")
+
+    build_json(args.month, args.format, args.rating, args.url)
+
     # Compile data files
     if args.compile:
         print("Compiling data files ...")

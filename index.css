@@ -22,6 +22,8 @@
   height: 50%;
 }
 
+/* Formatting Colours */
+
 .verygood {
   background-color: #155724; /* Dark green */
 }
@@ -40,4 +42,65 @@
 
 .verybad {
   background-color: #721c24; /* Dark red */
+}
+
+/* Type Colors */
+.bug {
+  background-color: rgb(196, 206, 142);
+}
+.dark {
+  background-color: rgb(160, 126, 102);
+}
+.dragon {
+  background-color: rgb(173, 151, 219);
+}
+.electric {
+  background-color: rgb(224, 184, 107);
+}
+.fairy {
+  background-color: rgb(222, 160, 213);
+}
+.fighting {
+  background-color: rgb(206, 133, 98);
+}
+.fire {
+  background-color: rgb(219, 98, 80);
+}
+.flying {
+  background-color: rgb(133, 161, 219);
+}
+.ghost {
+  background-color: rgb(146, 123, 191);
+}
+.grass {
+  background-color: rgb(133, 191, 123);
+}
+.ground {
+  background-color: rgb(219, 184, 132);
+}
+.ice {
+  background-color: rgb(132, 212, 219);
+}
+.normal {
+  background-color: rgb(185, 185, 164);
+}
+.poison {
+  background-color: rgb(185, 123, 164);
+}
+.psychic {
+  background-color: rgb(219, 123, 148);
+}
+.rock {
+  background-color: rgb(185, 164, 123);
+}
+.steel {
+  background-color: rgb(164, 164, 185);
+}
+.water {
+  background-color: rgb(107, 151, 219);
+}
+
+/* Stellar Tera Type */
+.stellar {
+  background-color: rgb(245, 245, 240);
 }

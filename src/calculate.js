@@ -59,6 +59,14 @@ function getSpread(str) {
   return spread;
 }
 
+function getTeraType(set) {
+  const other = Object.keys(set.other);
+  if (other.includes('tera type')) {
+    return set.other['tera type'];
+  }
+  return undefined;
+}
+
 function getPredictedWinner(opponent) {
   // 2+ Very Favourable
   // 1 Favourable
@@ -198,6 +206,63 @@ function getMonFieldEffects(mon) {
   return fieldEffects;
 }
 
+function checkFormeChangeStrict(species) {
+
+  // Specific species
+  switch (species) {
+    case "Gastrodon-East":
+    case "Gastrodon-West": {
+      return "Gastrodon";
+    }
+  }
+
+  // As-is
+  return species;
+}
+
+function checkFormeChange(species, options = {}) {
+
+  // Default forme data
+  const forme = {
+    species: species,
+    ability: options.ability,
+    item: options.item
+  };
+
+  switch (species) {
+    // Terapagos (Base Forme)
+    case "Terapagos": {
+      if (options.ability === 'Tera Shift') {
+        forme.species = "Terapagos-Terastal";
+        forme.ability = 'Tera Shell';
+      }
+    }
+    // Flow over from 'Terapagos'
+    case "Terapagos-Terastal": {
+      if (options.teraType === 'Stellar') {
+        forme.species = "Terapagos-Stellar";
+        forme.ability = 'Teraform Zero';
+      }
+    };
+      break;
+    // TODO: Add more here maybe
+    default: {
+      // Item forme changes
+      if (species in MEGA_STONES) {
+        for (const stone of MEGA_STONES[species]) {
+          if (options.item == stone.item) {
+            forme.species = stone.forme;
+            forme.ability = undefined;
+          }
+        }
+      }
+    };
+      break;
+  }
+
+  return forme;
+}
+
 function checkMoveChange(mon, moveName) {
 
   // Derefernece species
@@ -260,6 +325,9 @@ function challengeSpecies(mon, usage, options = {}) {
   // Get player-specific field effects
   const playerEffects = getPlayerEffects();
 
+  // Get opponent mon species
+  const species = checkFormeChangeStrict(usage.species);
+
   // Dereference generation
   const gen = mon.gen;
 
@@ -278,278 +346,260 @@ function challengeSpecies(mon, usage, options = {}) {
     }
 
     // Counter
-    let teraCount = 0;
+    let itemCount = 0;
 
-    // Loop over the tera types for the mon
-    for (const usageTera of usage["tera types"]) {
-
-      // Tera limit exceeded
-      if (teraCount >= CONFIG.limit.teras) {
+    // Loop over the items for the mon
+    for (const usageItem of usage.items) {
+      // Spread limit exceeded
+      if (itemCount >= CONFIG.limit.items) {
         break;
       }
 
-      // Get the type name
-      const tera = usageTera.option;
+      // Get the item name
+      const item = usageItem.option;
 
-      // Counter
-      let itemCount = 0;
+      // Get the most common ability (highest usage)
+      const ability = usage.abilities.at(0).option;
 
-      // Loop over the items for the mon
-      for (const usageItem of usage.items) {
-        // Spread limit exceeded
-        if (itemCount >= CONFIG.limit.items) {
-          break;
-        }
+      // Convert string to spread
+      const spread = getSpread(usageSpread.option);
 
-        // Get the item name
-        const item = usageItem.option;
+      try {
+        // Switch on species
+        switch (species) {
+          case "Aegislash":
+            {
+              // Use Blade Forme when Attacking
+              const oppAtk = new calc.Pokemon(gen, "Aegislash-Blade", {
+                level: mon.level,
+                ability: ability,
+                nature: spread.nature,
+                item: item,
+                evs: spread.stats,
+              });
 
-        // Get species for the usage
-        let species = usage.species;
+              // Use Shield Forme when Defending
+              const oppDef = new calc.Pokemon(gen, "Aegislash-Shield", {
+                level: mon.level,
+                ability: ability,
+                nature: spread.nature,
+                item: item,
+                evs: spread.stats,
+              });
 
-        // Get the most common ability (highest usage)
-        let ability = usage.abilities.at(0).option;
-
-        // Get the list of mega stones
-        const megaStones = Object.keys(calc.MEGA_STONES);
-
-        // If the item is a mega stone
-        if (megaStones.includes(item)) {
-          // If the mega stone matches the species
-          if (species === calc.MEGA_STONES[item]) {
-            // Update the species
-            species = stone.forme;
-
-            // Clear the ability
-            ability = undefined;
-          }
-        }
-
-        // Convert string to spread
-        const spread = getSpread(usageSpread.option);
-
-        try {
-          // Switch on species
-          switch (species) {
-            case "Aegislash":
-              {
-                // Use Blade Forme when Attacking
-                const oppAtk = new calc.Pokemon(gen, "Aegislash-Blade", {
-                  level: mon.level,
-                  ability: ability,
-                  nature: spread.nature,
-                  // teraType: tera, 
-                  item: item,
-                  evs: spread.stats,
-                });
-
-                // Use Shield Forme when Defending
-                const oppDef = new calc.Pokemon(gen, "Aegislash-Shield", {
-                  level: mon.level,
-                  ability: ability,
-                  nature: spread.nature,
-                  // teraType: tera, 
-                  item: item,
-                  evs: spread.stats,
-                });
-
-                // Create the calc opponent object
-                const opponent = getCalcOpp(oppDef, spread, item);
-                opponent.pokemon.moves = usage.moves.map((x) => x.option);
+              // Create the calc opponent object
+              const opponent = getCalcOpp(oppDef, spread, item);
+              opponent.pokemon.moves = usage.moves.map((x) => x.option);
+              
+              // At least one tera type
+              if (usage["tera types"].length) {
+                // Get the first (most common) tera type
+                const tera = usage["tera types"].at(0).option;
                 opponent.pokemon["tera type"] = tera;
+              }
 
-                // Defend only NOT set
-                if (!options.defendOnly) {
+              // Defend only NOT set
+              if (!options.defendOnly) {
 
-                  // Combine player, opponent, default effects
-                  const field = new calc.Field(combineFieldEffects(
-                    mon, oppDef, defaultField, playerEffects, true
-                  ));
+                // Combine player, opponent, default effects
+                const field = new calc.Field(combineFieldEffects(
+                  mon, oppDef, defaultField, playerEffects, true
+                ));
 
-                  // Loop over team moves
-                  for (let moveName of mon.moves) {
-                    // Check if move changes (e.g. Zacian-C and Iron Head)
-                    moveName = checkMoveChange(mon, moveName);
-                    const move = new calc.Move(gen, moveName);
-                    const result = calc.calculate(gen, mon, oppDef, move, field);
-                    if (result.damage != 0) {
-                      opponent.attacking.push({
-                        data: {
-                          kochance: result.kochance(),
-                          range: result.range(),
-                        },
-                        fullDesc: result.fullDesc(),
-                        moveDesc: result.moveDesc(),
-                        desc: result.desc(),
-                        move: result.move.name,
-                      });
-                    }
+                // Loop over team moves
+                for (let moveName of mon.moves) {
+                  // Check if move changes (e.g. Zacian-C and Iron Head)
+                  moveName = checkMoveChange(mon, moveName);
+                  const move = new calc.Move(gen, moveName);
+                  const result = calc.calculate(gen, mon, oppDef, move, field);
+                  if (result.damage != 0) {
+                    opponent.attacking.push({
+                      data: {
+                        kochance: result.kochance(),
+                        range: result.range(),
+                      },
+                      fullDesc: result.fullDesc(),
+                      moveDesc: result.moveDesc(),
+                      desc: result.desc(),
+                      move: result.move.name,
+                    });
                   }
-
-                  // Sort the attacks from most to least effective
-                  opponent.attacking.sort(moveSortFunc);
                 }
 
-                // Attack only NOT set
-                if (!options.attackOnly) {
-                  // Counter
-                  let moveCount = 0;
+                // Sort the attacks from most to least effective
+                opponent.attacking.sort(moveSortFunc);
+              }
 
-                  // Combine player, opponent, default effects
-                  const field = new calc.Field(combineFieldEffects(
-                    oppAtk, mon, defaultField, playerEffects, false
-                  ));
+              // Attack only NOT set
+              if (!options.attackOnly) {
+                // Counter
+                let moveCount = 0;
 
-                  for (const usageMove of usage.moves) {
-                    // Break after limit
-                    if (moveCount >= CONFIG.limit.moves)
-                      break;
+                // Combine player, opponent, default effects
+                const field = new calc.Field(combineFieldEffects(
+                  oppAtk, mon, defaultField, playerEffects, false
+                ));
 
-                    // Get the name for the move
-                    let moveName = usageMove.option;
+                for (const usageMove of usage.moves) {
+                  // Break after limit
+                  if (moveCount >= CONFIG.limit.moves)
+                    break;
 
-                    // Check if move changes (e.g. Zacian-C and Iron Head)
-                    moveName = checkMoveChange(oppAtk, moveName);
+                  // Get the name for the move
+                  let moveName = usageMove.option;
 
-                    const move = new calc.Move(gen, moveName);
-                    const result = calc.calculate(gen, oppAtk, mon, move, field);
-                    if (result.damage != 0) {
-                      opponent.defending.push({
-                        data: {
-                          kochance: result.kochance(),
-                          range: result.range(),
-                        },
-                        fullDesc: result.fullDesc(),
-                        moveDesc: result.moveDesc(),
-                        desc: result.desc(),
-                        move: result.move.name,
-                      });
-                      moveCount++;
-                    }
+                  // Check if move changes (e.g. Zacian-C and Iron Head)
+                  moveName = checkMoveChange(oppAtk, moveName);
+
+                  const move = new calc.Move(gen, moveName);
+                  const result = calc.calculate(gen, oppAtk, mon, move, field);
+                  if (result.damage != 0) {
+                    opponent.defending.push({
+                      data: {
+                        kochance: result.kochance(),
+                        range: result.range(),
+                      },
+                      fullDesc: result.fullDesc(),
+                      moveDesc: result.moveDesc(),
+                      desc: result.desc(),
+                      move: result.move.name,
+                    });
+                    moveCount++;
                   }
-
-                  // Sort the attacks from most to least effective
-                  opponent.defending.sort(moveSortFunc);
                 }
+
+                // Sort the attacks from most to least effective
+                opponent.defending.sort(moveSortFunc);
+              }
+
+              // Calculate the matchup odds for the opponent
+              opponent.matchup = getPredictedWinner(opponent);
+
+              // Add to the opponents
+              opponents.push(opponent);
+            }
+            break;
+          default:
+            {
+              // Check for forme changes
+              const forme = checkFormeChange(usage.species, {
+                ability: ability,
+                item: item
+              });
+
+              // Generate mon for the spread
+              const opp = new calc.Pokemon(gen, forme.species, {
+                level: mon.level,
+                ability: forme.ability,
+                nature: spread.nature,
+                item: item,
+                evs: spread.stats,
+              });
+
+              // Create the calc opponent object
+              const opponent = getCalcOpp(opp, spread, item);
+              opponent.pokemon.moves = usage.moves.map((x) => x.option);
+
+              // At least one tera type
+              if (usage["tera types"].length) {
+                // Get the first (most common) tera type
+                const tera = usage["tera types"].at(0).option;
+                opponent.pokemon["tera type"] = tera;
+              }
+
+              // Defend only NOT set
+              if (!options.defendOnly) {
+                // Combine player, opponent, default effects
+                const field = new calc.Field(combineFieldEffects(
+                  mon, opp, defaultField, playerEffects, true
+                ));
+
+                // Loop over team moves
+                for (let moveName of mon.moves) {
+                  // Check if move changes (e.g. Zacian-C and Iron Head)
+                  moveName = checkMoveChange(mon, moveName);
+                  const move = new calc.Move(gen, moveName);
+
+                  // Break Fix: Hard-Coded Ghost Type Hitting for Tera Starstorm
+                  const isTeraStarstorm = mon.species.name === 'Terapagos-Stellar' && moveName === 'Tera Starstorm';
+                  field.defenderSide.isForesight = isTeraStarstorm;
+
+                  const result = calc.calculate(gen, mon, opp, move, field);
+                  if (result.damage != 0) {
+                    opponent.attacking.push({
+                      data: {
+                        kochance: result.kochance(),
+                        range: result.range(),
+                      },
+                      fullDesc: result.fullDesc(),
+                      moveDesc: result.moveDesc(),
+                      desc: result.desc(),
+                      move: result.move.name,
+                    });
+                  }
+                }
+
+                // Sort the attacks from most to least effective
+                opponent.attacking.sort(moveSortFunc);
+              }
+
+              // Attack only NOT set
+              if (!options.attackOnly) {
+                // Counter
+                let moveCount = 0;
+
+                // Combine player, opponent, default effects
+                const field = new calc.Field(combineFieldEffects(
+                  opp, mon, defaultField, playerEffects, false
+                ));
+
+                // Loop over mon moves
+                for (const usageMove of usage.moves) {
+                  // Break after limit
+                  if (moveCount >= CONFIG.limit.moves)
+                    break;
+
+                  // Get the name for the move
+                  let moveName = usageMove.option;
+
+                  // Check if move changes (e.g. Zacian-C and Iron Head)
+                  moveName = checkMoveChange(opp, moveName);
+                  const move = new calc.Move(gen, moveName);
+                  const result = calc.calculate(gen, opp, mon, move, field);
+                  if (result.damage != 0) {
+                    opponent.defending.push({
+                      data: {
+                        kochance: result.kochance(),
+                        range: result.range(),
+                      },
+                      fullDesc: result.fullDesc(),
+                      moveDesc: result.moveDesc(),
+                      desc: result.desc(),
+                      move: result.move.name,
+                    });
+                    moveCount++;
+                  }
+                }
+
+                // Sort the attacks from most to least effective
+                opponent.defending.sort(moveSortFunc);
 
                 // Calculate the matchup odds for the opponent
                 opponent.matchup = getPredictedWinner(opponent);
-
-                // Add to the opponents
-                opponents.push(opponent);
               }
-              break;
-            default:
-              {
-                // Generate mon for the spread
-                const opp = new calc.Pokemon(gen, species, {
-                  level: mon.level,
-                  ability: ability,
-                  nature: spread.nature,
-                  // teraType: tera,
-                  item: item,
-                  evs: spread.stats,
-                });
 
-                // Create the calc opponent object
-                const opponent = getCalcOpp(opp, spread, item);
-                opponent.pokemon.moves = usage.moves.map((x) => x.option);
-                opponent.pokemon["tera type"] = tera;
-
-                // Defend only NOT set
-                if (!options.defendOnly) {
-
-                  // Combine player, opponent, default effects
-                  const field = new calc.Field(combineFieldEffects(
-                    mon, opp, defaultField, playerEffects, true
-                  ));
-
-                  // Loop over team moves
-                  for (let moveName of mon.moves) {
-                    // Check if move changes (e.g. Zacian-C and Iron Head)
-                    moveName = checkMoveChange(mon, moveName);
-                    const move = new calc.Move(gen, moveName);
-                    const result = calc.calculate(gen, mon, opp, move, field);
-                    if (result.damage != 0) {
-                      opponent.attacking.push({
-                        data: {
-                          kochance: result.kochance(),
-                          range: result.range(),
-                        },
-                        fullDesc: result.fullDesc(),
-                        moveDesc: result.moveDesc(),
-                        desc: result.desc(),
-                        move: result.move.name,
-                      });
-                    }
-                  }
-
-                  // Sort the attacks from most to least effective
-                  opponent.attacking.sort(moveSortFunc);
-                }
-
-                // Attack only NOT set
-                if (!options.attackOnly) {
-                  // Counter
-                  let moveCount = 0;
-
-                  // Combine player, opponent, default effects
-                  const field = new calc.Field(combineFieldEffects(
-                    opp, mon, defaultField, playerEffects, false
-                  ));
-
-                  // Loop over mon moves
-                  for (const usageMove of usage.moves) {
-                    // Break after limit
-                    if (moveCount >= CONFIG.limit.moves)
-                      break;
-
-                    // Get the name for the move
-                    let moveName = usageMove.option;
-
-                    // Check if move changes (e.g. Zacian-C and Iron Head)
-                    moveName = checkMoveChange(opp, moveName);
-
-                    const move = new calc.Move(gen, moveName);
-                    const result = calc.calculate(gen, opp, mon, move, field);
-                    if (result.damage != 0) {
-                      opponent.defending.push({
-                        data: {
-                          kochance: result.kochance(),
-                          range: result.range(),
-                        },
-                        fullDesc: result.fullDesc(),
-                        moveDesc: result.moveDesc(),
-                        desc: result.desc(),
-                        move: result.move.name,
-                      });
-                      moveCount++;
-                    }
-                  }
-
-                  // Sort the attacks from most to least effective
-                  opponent.defending.sort(moveSortFunc);
-
-                  // Calculate the matchup odds for the opponent
-                  opponent.matchup = getPredictedWinner(opponent);
-                }
-
-                // Add to the opponents
-                opponents.push(opponent);
-              }
-              break;
-          }
-        } catch (
-        e // Failed for species ...
-        ) {
-          console.warn(`Failed for species '${species}': ${String(e)} ...`);
+              // Add to the opponents
+              opponents.push(opponent);
+            }
+            break;
         }
-
-        itemCount++;
+      } catch (
+      e // Failed for species ...
+      ) {
+        console.warn(`Failed for species '${species}': ${String(e)} ...`);
       }
 
-      // Increment
-      teraCount++;
+      itemCount++;
     }
 
     spreadCount++;
@@ -585,8 +635,17 @@ function calculateTeam(team, usage, format, level = 50) {
   const totalCalcs = {};
 
   // Loop over the Pokemon
-  for (const set of team) {
-    const species = set.species;
+  for (const index in team) {
+    // Dereference set data
+    const set = team[index];
+    const species = checkFormeChangeStrict(set.species);
+
+    // Check for player terastal
+    const id = `mon-player-${index}`;
+    const tera = document.tera[id].enabled;
+
+    // If tera is enabled, check for tera type
+    const teraType = tera ? getTeraType(set) : undefined;
 
     try {
       // Switch on species
@@ -600,6 +659,7 @@ function calculateTeam(team, usage, format, level = 50) {
             evs: set.evs,
             ability: set.ability,
             moves: set.moves,
+            teraType: teraType
           });
 
           const monDef = new calc.Pokemon(gen, "Aegislash-Shield", {
@@ -608,6 +668,7 @@ function calculateTeam(team, usage, format, level = 50) {
             evs: set.evs,
             ability: set.ability,
             moves: set.moves,
+            teraType: teraType
           });
 
           // Get calcs table (override to 'Aegislash')
@@ -634,14 +695,22 @@ function calculateTeam(team, usage, format, level = 50) {
           totalCalcs[species] = calcsTable;
         }; break;
         default: {
+          // Check for forme changes
+          const forme = checkFormeChange(species, {
+            ability: set.ability,
+            item: set.item,
+            teraType: teraType
+          });
+
           // Create the calcs mon for the set
-          const mon = new calc.Pokemon(gen, species, {
+          const mon = new calc.Pokemon(gen, forme.species, {
             level: level,
             nature: set.nature,
             evs: set.evs,
-            ability: set.ability,
+            ability: forme.ability,
             moves: set.moves,
-            item: set.item
+            item: set.item,
+            teraType: teraType
           });
 
           // Get calcs table
@@ -657,7 +726,7 @@ function calculateTeam(team, usage, format, level = 50) {
               break;
 
             // Get the opponent species
-            const oppSpecies = speciesUsage.species;
+            const oppSpecies = checkFormeChangeStrict(speciesUsage.species);
 
             // Run the calcs for the mon against the target species
             const opponents = challengeSpecies(mon, speciesUsage);
@@ -742,7 +811,7 @@ function checkSpeedTierItem(template) {
   const copies = [];
 
   // Loop over the items
-  for(const item of template.item) {
+  for (const item of template.item) {
     // Boost stage
     let stage = 0;
 
@@ -754,7 +823,6 @@ function checkSpeedTierItem(template) {
           stage += 1;
       }; break;
       case 'Choice Scarf': {
-        console.log(template.ev, CONFIG.scarf);
         if (template.ev > CONFIG.scarf)
           stage += 1;
       }; break;
@@ -789,8 +857,8 @@ function checkSpeedTierAbility(template) {
   const copies = [];
 
   // Loop over the abilities
-  for(const ability of template.ability) {
-      
+  for (const ability of template.ability) {
+
     // Boost stage
     let stage = 0;
 
@@ -814,19 +882,19 @@ function checkSpeedTierAbility(template) {
         stage += 2;
       }; break;
     }
-  
+
     // Stage modified
     if (stage != 0) {
       // Create a deep copy of the template
       copy = JSON.parse(JSON.stringify(template));
-  
+
       // Apply the stat change
       copy.stat = applyStageMultiplier(copy.stat, stage);
-  
+
       // Update other fields
       copy.mod = ability;
       copy.stage = stage;
-      
+
       // Add to the copies
       copies.push(copy);
     }
@@ -838,8 +906,9 @@ function checkSpeedTierAbility(template) {
 
 function applySpeedTierModifiers(tiers, config) {
   let tierCount = tiers.length;
-  for(let i=0; i<tierCount; i++) {
+  for (let i = 0; i < tierCount; i++) {
     const template = tiers[i];
+
     // Ability effects enabled
     if (config.ability) {
       const copies = checkSpeedTierAbility(template);
@@ -881,7 +950,16 @@ function getUsageMonSpeedTiers(gen, usage, level) {
   const tiers = {};
 
   // Dereference species data
-  const species = usage.species;
+  let species = checkFormeChangeStrict(usage.species);
+
+  // Failsafe (Speed Tiers only)
+  if (species === "Aegislash") {
+    species = "Aegislash-Shield";
+  }
+
+  // Filter the available items & abilities for the Pokemon
+  const ability = usage.abilities.filter(x => x.usage > CONFIG.usage.ability).map(x => x.option);
+  const item = usage.items.filter(x => x.usage > CONFIG.usage.item).map(x => x.option);
 
   // Loop over the spreads
   for (const spread of usage.spreads) {
@@ -922,10 +1000,10 @@ function getUsageMonSpeedTiers(gen, usage, level) {
           iv: ivs['spe'],
           ev: evs.stats['spe'],
           nature: evs.nature,
-          ability: usage.abilities.filter(x => x.usage > CONFIG.usage.ability).map(x => x.option),
+          ability: ability,
           proto: checkProtoSpeedBoost(mon.rawStats),
           usage: spread.usage,
-          item: usage.items.filter(x => x.usage > CONFIG.usage.item).map(x => x.option),
+          item: item,
           mod: null,
         }
       }
@@ -949,8 +1027,14 @@ function calculateSpeedTiers(team, usage, format, level = 50) {
 
   // Loop over the Pokemon
   for (const set of team) {
+
     // Dereference species
-    const species = set.species;
+    let species = checkFormeChangeStrict(set.species);
+
+    // Failsafe (Speed Tiers only)
+    if (species === "Aegislash") {
+      species = "Aegislash-Shield";
+    }
 
     // Create the Pokemon object for the set
     const mon = new calc.Pokemon(gen, species, {
@@ -963,7 +1047,35 @@ function calculateSpeedTiers(team, usage, format, level = 50) {
     });
 
     // Get the speed tier object
-    const tiers = applySpeedTierModifiers(getPlayerMonSpeedTiers(mon), config.player);
+    let tiers = applySpeedTierModifiers(
+      getPlayerMonSpeedTiers(mon),
+      config.player
+    );
+
+    // Check for forme changes for the species
+    const forme = checkFormeChange(species, {
+      ability: set.ability,
+      item: set.item
+    });
+
+    // Forme change is different
+    if (forme.species !== species) {
+      // Create a new Pokemon for the set
+      const formeMon = new calc.Pokemon(gen, forme.species, {
+        level: level,
+        nature: set.nature,
+        evs: set.evs,
+        ability: forme.ability,
+        moves: set.moves,
+        item: set.item
+      });
+
+      // Add new forme to the tiers list
+      tiers = tiers.concat(applySpeedTierModifiers(
+        getPlayerMonSpeedTiers(formeMon),
+        config.player
+      ));
+    }
 
     // Add to the speeds
     for (const tier of tiers) {
@@ -974,12 +1086,15 @@ function calculateSpeedTiers(team, usage, format, level = 50) {
   let monCount = 0;
   // Loop over usage mons
   for (const set of usage) {
-    
+
     // Break after limit
     if (monCount > CONFIG.limit.mons)
       break;
 
-    const tiers = applySpeedTierModifiers(getUsageMonSpeedTiers(gen, set, level), config.other);
+    const tiers = applySpeedTierModifiers(
+      getUsageMonSpeedTiers(gen, set, level),
+      config.other
+    );
 
     // Add to the speeds
     for (const tier of tiers) {

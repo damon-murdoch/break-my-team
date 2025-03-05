@@ -8,7 +8,7 @@
 # 4: Items
 # 5: Spreads
 # 6: Moves
-# 7: Tera Types
+# 7: Tera Types (Gen 9+ Only)
 # 8: Teammates
 # 9: Checks & Counters
 
@@ -113,38 +113,57 @@ def parse_format_data(content):
             # Strip inner whitespace
             reduced = line.strip()
 
-            match sector:
-                case 1: # Species
-                    # Create new data entry for the species
-                    current = get_data_template(reduced)
-                case 2: # Metadata
-                    k,v = reduced.split(":")
-                    match k:
-                        case "Raw count": 
-                            current["metadata"]["count"] = int(v)
-                        case "Avg. weight":
-                            current["metadata"]["weight"] = float(v)
-                        case "Viability Ceiling": 
-                            current["metadata"]["ceiling"] = int(v)
-                        case _:
-                            print(f"Unhandled metadata: {k}, {v}")
-                case _: # Default
-                    # Sector is in range
-                    if sector < len(SECTORS):
+            match reduced:
+                # Check for headings
+                
+                case "Abilities": 
+                    sector = 3
+                case "Items": 
+                    sector = 4
+                case "Spreads": 
+                    sector = 5
+                case "Moves": 
+                    sector = 6
+                case "Tera Types":
+                    sector = 7
+                case "Teammates": 
+                    sector = 8
+                case "Checks and Counters": 
+                    sector = 9
 
-                        # Get the sector id
-                        sector_name = SECTORS[sector]
+                case _: # General case
+                    match sector:
+                        case 1: # Species
+                            # Create new data entry for the species
+                            current = get_data_template(reduced)
+                        case 2: # Metadata
+                            k,v = reduced.split(":")
+                            match k:
+                                case "Raw count": 
+                                    current["metadata"]["count"] = int(v)
+                                case "Avg. weight":
+                                    current["metadata"]["weight"] = float(v)
+                                case "Viability Ceiling": 
+                                    current["metadata"]["ceiling"] = int(v)
+                                case _:
+                                    print(f"Unhandled metadata: {k}, {v}")
+                        case _: # Default
+                            # Sector is in range
+                            if sector < len(SECTORS):
 
-                        # Not 'None'
-                        if sector_name:
+                                # Get the sector id
+                                sector_name = SECTORS[sector]
+
+                                # Not 'None'
+                                if sector_name:
+                                    
+                                    # Add the usage stats to the sector data
+                                    add_stats_to_current(reduced, current[sector_name])
+
+                                # TODO: Handle 'Else'
+
+                            # TODO: Handle 'Else'
                             
-                            # Add the usage stats to the sector data
-                            add_stats_to_current(reduced, current[sector_name])
-
-                        # TODO: Handle 'Else'
-
-                    # TODO: Handle 'Else'
-                    
     # File has ended
     if current:
         # Add current to data
