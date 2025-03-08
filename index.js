@@ -564,7 +564,50 @@ function populateTable(table) {
   }
 }
 
-function populateReport(table, tiers, sets) {
+function getStatsTable(mon) {
+  return `
+  <table>
+    <tr>
+      <th> Field </th>
+      <th> HP </th>
+      <th> Atk </th>
+      <th> Def </th>
+      <th> SpA </th>
+      <th> SpD </th>
+      <th> Spe </th>
+    </tr>
+    <tr>
+      <th> EVs </th>
+      <td> ${mon.evs['hp']} </td>
+      <td> ${mon.evs['atk']} </td>
+      <td> ${mon.evs['def']} </td>
+      <td> ${mon.evs['spa']} </td>
+      <td> ${mon.evs['spd']} </td>
+      <td> ${mon.evs['spe']} </td>
+    </tr>
+    <tr>
+      <th> IVs </th>
+      <td> ${mon.ivs['hp']} </td>
+      <td> ${mon.ivs['atk']} </td>
+      <td> ${mon.ivs['def']} </td>
+      <td> ${mon.ivs['spa']} </td>
+      <td> ${mon.ivs['spd']} </td>
+      <td> ${mon.ivs['spe']} </td>
+    </tr>
+    <tr>
+      <th> Stats </th>
+      <td> ${mon.stats['hp']} </td>
+      <td> ${mon.stats['atk']} </td>
+      <td> ${mon.stats['def']} </td>
+      <td> ${mon.stats['spa']} </td>
+      <td> ${mon.stats['spd']} </td>
+      <td> ${mon.stats['spe']} </td>
+    </tr>
+  </table>
+  `;
+}
+
+function populateReport(table, tiers, sets, level) {
 
   // Get the report config
   const config = getReportConfig();
@@ -702,8 +745,8 @@ function populateReport(table, tiers, sets) {
     // Speeds Table
     damageCalcs = document.createElement('div');
     damageCalcs.innerHTML =`
-      <h4 id='report-damage-calcs'>
-        Damage Calcs
+      <h4 id='report-team-matchups'>
+        Team Matchups
       </h4>
       <p>
         Field Effects
@@ -713,25 +756,24 @@ function populateReport(table, tiers, sets) {
 ${JSON.stringify(fieldEffects, null, 2)}
         </pre>
       </code>
-      <h4 id='report-team-matchups'>
-        Team Matchups
-      </h4>
     `;
 
     let i=0; 
     // Player team mons
     for (const member of members) {
 
+      // Get the pokemon stats
+      const mon = table[member].pokemon;
+
       // Species Title
       const speciesStr = `
         <h5 id='report-mon-${i}'>
           ${i + 1}. ${member}
         </h5>
-        <code>
-          <pre class='text-light'>
-${getMonTooltip(sets[i])}
-          </pre>
-        </code>
+        <h6 class='text-light'>
+          Stats (Lv. ${level})
+        </h6>
+        ${getStatsTable(mon)}
         <h5>
           Threats
         </h5>
@@ -876,8 +918,8 @@ ${getMonTooltip(sets[i])}
       // Generate list
       ul.innerHTML += `
       <li>
-        <a class='text-light' href='#report-damage-calcs'>
-          Damage Calcs
+        <a class='text-light' href='#report-team-matchups'>
+          Team Matchups
         </a>
         <ul>
           ${calcMons.join('')}
@@ -1045,7 +1087,7 @@ function update(format = null) {
         const table = calculateTeam(sets, DATA[format], info, level);
 
         // Populate the report
-        populateReport(table, tiers, sets);
+        populateReport(table, tiers, sets, level);
       };
       break;
       
