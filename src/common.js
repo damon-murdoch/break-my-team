@@ -32,10 +32,10 @@ function sanitiseString(str) {
   return str.toLowerCase().replace(" ", "-");
 }
 
-function itemString (str) {
+function itemString(str) {
   // Sanitise the item string
   let itemStr = sanitiseString(str);
-  
+
   // Remove missing sprite suffixes
   itemStr = itemStr.replace('-berry', '');
   itemStr = itemStr.replace('-plate', '');
@@ -44,20 +44,20 @@ function itemString (str) {
   return itemStr;
 }
 
-function getDamageColour(n, incoming=false) {
-  switch(n) {
-    case 1: return incoming ? 'verybad': 'verygood'; 
-    case 2: return incoming ? 'bad' : 'good'; 
+function getDamageColour(n, incoming = false) {
+  switch (n) {
+    case 1: return incoming ? 'verybad' : 'verygood';
+    case 2: return incoming ? 'bad' : 'good';
     case 3: return 'neutral';
-    case 4: return incoming ? 'good' : 'bad'; 
+    case 4: return incoming ? 'good' : 'bad';
     case 0: // Cannot KO, Flow over
-    default: 
-      return incoming ? 'verygood' : 'verybad'; 
+    default:
+      return incoming ? 'verygood' : 'verybad';
   }
 }
 
 function getMatchupColour(n) {
-  switch(n) {
+  switch (n) {
     case 1: return 'good';
     case 0: return 'neutral';
     case -1: return 'bad';
@@ -68,7 +68,7 @@ function getMatchupColour(n) {
   }
 }
 
-function getThreatTooltip (mon) {
+function getThreatTooltip(mon) {
 
   // Tooltip Text (e.g. Urshifu @ Focus Sash)
   let tooltip = `${mon.name} @ ${mon.item}\n`;
@@ -101,12 +101,12 @@ function getThreatTooltip (mon) {
   }
 
   // Add moves
-  let n=0;
-  for(const move of mon.moves) {
+  let n = 0;
+  for (const move of mon.moves) {
     if (n < 4) {
       tooltip += `- ${move}\n`;
     } else {
-      tooltip += `(+${mon.moves.length-n} more)\n`;
+      tooltip += `(+${mon.moves.length - n} more)\n`;
       break;
     }
     n++;
@@ -115,7 +115,7 @@ function getThreatTooltip (mon) {
   return tooltip;
 }
 
-function getMonTooltip (set) {
+function getMonTooltip(set) {
   // Tooltip Text (e.g. Urshifu @ Focus Sash)
   let tooltip = `${set.species} @ ${set.item}\n`;
 
@@ -154,7 +154,7 @@ function getMonTooltip (set) {
   }
 
   // Add moves
-  for(const move of set.moves) {
+  for (const move of set.moves) {
     tooltip += `- ${move}\n`;
   }
 
@@ -187,6 +187,24 @@ function getSpriteString(species, item = null, tooltip = null, id = null) {
     <img src="img/box/${species}.png" style="width: 100%; height: auto;">
     ${itemHtml}
   </th>`;
+}
+
+function getUsageStr(usage, min = 1) {
+  let str = [];
+  for (const u of usage) {
+    // Not 'other', and greater than min. usage
+    if ((u.option != "Other") && (u.usage > min)) 
+    {
+      // Round to 2 decimal places
+      const usage = u.usage.toFixed(1);
+
+      // Add option (usage) to list
+      str.push(`${u.option} (${usage}%)`);
+    }
+  }
+
+  // Join string using ,
+  return str.join(", ")
 }
 
 function getMatchupString(matchup) {

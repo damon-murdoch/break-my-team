@@ -54,12 +54,16 @@ function getReportConfig() {
   // Include Damage Calcs
   const includeDamageCalcs = document.getElementById('include-damage').value === 'include';
 
+  // Include Usage Stats
+  const includeUsageStats = document.getElementById('include-usage').value === 'include';
+
   return {
-    teamName: teamName, 
-    teamAuthor: teamAuthor, 
-    includeToC: includeToC, 
-    includeTeamPaste: includeTeamPaste, 
-    includeSpeedTiers: includeSpeedTiers, 
+    teamName: teamName,
+    teamAuthor: teamAuthor,
+    includeToC: includeToC,
+    includeTeamPaste: includeTeamPaste,
+    includeSpeedTiers: includeSpeedTiers,
+    includeUsageStats: includeUsageStats, 
     includeDamageCalcs: includeDamageCalcs
   }
 }
@@ -180,12 +184,12 @@ function getFormatInfo(format) {
   else // Hard-coded format
   {
     // Switch on format
-    switch(table.format) {
-      case 'vgc2014': 
-      case 'vgc2015': 
-      case 'vgc2016': 
+    switch (table.format) {
+      case 'vgc2014':
+      case 'vgc2015':
+      case 'vgc2016':
         table.gen = 6;
-      break;
+        break;
       default:
         throw Error(`Unable to find generation for format '${table.format}'!`);
     }
@@ -267,7 +271,7 @@ function addTeraToggle(id, type = undefined) {
 
     // Get the tera type for the id
     const tera = document.tera[id];
-    if (tera.type) {      
+    if (tera.type) {
       // Toggle tera enabled / disabled
       tera.enabled = !tera.enabled;
 
@@ -607,11 +611,11 @@ function getStatsTable(mon) {
   `;
 }
 
-function populateReport(table, tiers, sets, level) {
+function populateReport(table, tiers, usage, sets, level) {
 
   // Get the report config
   const config = getReportConfig();
-  
+
   // Get all of the team members
   const members = Object.keys(table);
 
@@ -659,13 +663,67 @@ function populateReport(table, tiers, sets, level) {
     // Ensure white text
     pre.classList = 'text-light';
     // Add the sets
-    for(const set of sets) {
+    for (const set of sets) {
       // Add the tooltip to the html
       pre.innerHTML += `${getMonTooltip(set)}\n`;
     }
     code.appendChild(pre);
     teamPaste.appendChild(code);
   }
+
+  // Usage Stats div
+  let usageStats = null;
+  if (config.includeUsageStats) {
+    // Usage Table
+    usageStats = document.createElement('div');
+    usageStats.innerHTML = `
+    <h4 id='report-usage-stats'>
+      Usage Stats
+    </h4>
+    `;
+
+    let i = 0;
+    for (const threat of usage) {
+      // Break if exceeds 'limit' mons
+      if (i >= CONFIG.limit.mons) break;
+
+      const species = threat.species;
+
+      // Basic usage stats
+      const abilitiesStr = getUsageStr(threat.abilities, 1);
+      const itemsStr = getUsageStr(threat.items, 10);
+      const movesStr = getUsageStr(threat.moves, 10);
+      const teraStr = getUsageStr(threat["tera types"], 10);
+
+      // Generate threat str
+      let threatStr = `<h5 id='report-usage-${species}'>${(i + 1)}. ${species}</h5>`;
+
+      // At least one ability
+      if (abilitiesStr != "") {
+        threatStr += `<p><b>Abilities:</b> ${abilitiesStr}</p>`;
+      }
+
+      // At least one item
+      if (itemsStr != "") {
+        threatStr += `<p><b>Items:</b> ${itemsStr}</p>`;
+      }
+
+      // At least one move
+      if (movesStr != "") {
+        threatStr += `<p><b>Moves:</b> ${movesStr}</p>`;
+      }
+
+      // At least one tera type
+      if (teraStr != "") {
+        threatStr += `<p><b>Tera Types:</b> ${teraStr}</p>`;
+      }
+
+      // Add threat to stats
+      usageStats.innerHTML += threatStr;
+
+      i++;
+    }
+  };
 
   // Speed tiers div
   let speedTiers = null;
@@ -691,7 +749,7 @@ function populateReport(table, tiers, sets, level) {
     speedsTable.appendChild(speedsHead);
 
     // Loop over all of the tiers
-    for(const tier of tiers) {
+    for (const tier of tiers) {
       const tr = document.createElement('tr');
 
       // Placeholders
@@ -744,7 +802,7 @@ function populateReport(table, tiers, sets, level) {
 
     // Speeds Table
     damageCalcs = document.createElement('div');
-    damageCalcs.innerHTML =`
+    damageCalcs.innerHTML = `
       <h4 id='report-team-matchups'>
         Team Matchups
       </h4>
@@ -758,7 +816,7 @@ ${JSON.stringify(fieldEffects, null, 2)}
       </code>
     `;
 
-    let i=0; 
+    let i = 0;
     // Player team mons
     for (const member of members) {
 
@@ -781,17 +839,17 @@ ${JSON.stringify(fieldEffects, null, 2)}
 
       // Add species string to report
       damageCalcs.innerHTML += speciesStr;
-      
-      let j=1;
+
+      let j = 1;
       // Loop over the threats
-      for(const threat of threats) {
+      for (const threat of threats) {
         // Add threat name, index to report
         damageCalcs.innerHTML += `<h6>${j}. ${threat}</h6>`;
 
         // Get the number of sets for the threat
         const sets = table[members[0]].opponents[threat];
 
-        let k=1;
+        let k = 1;
         for (const setIndex in sets) {
 
           // Get the matchup data for the member, threat
@@ -820,7 +878,7 @@ ${JSON.stringify(fieldEffects, null, 2)}
 
           // Attacking Calcs
           const attacking = [];
-          for(const attack of setData.attacking) {
+          for (const attack of setData.attacking) {
             attacking.push(`<li>${attack.fullDesc}</li>`);
           }
 
@@ -836,7 +894,7 @@ ${JSON.stringify(fieldEffects, null, 2)}
 
           // Defending Calcs
           const defending = [];
-          for(const attack of setData.defending) {
+          for (const attack of setData.defending) {
             defending.push(`<li>${attack.fullDesc}</li>`);
           }
 
@@ -870,7 +928,7 @@ ${JSON.stringify(fieldEffects, null, 2)}
       Table of Contents
     </h4>
     `
-  
+
     // Create ordered list
     const ul = document.createElement('ul');
     ul.id = 'report-toc';
@@ -885,7 +943,7 @@ ${JSON.stringify(fieldEffects, null, 2)}
       </li>
       `;
     }
-  
+
     // Include Speed Tiers in report
     if (config.includeSpeedTiers) {
       ul.innerHTML += `
@@ -896,16 +954,16 @@ ${JSON.stringify(fieldEffects, null, 2)}
       </li>
       `;
     }
-  
+
     // Include Damage Calcs in report
     if (config.includeDamageCalcs) {
-  
+
       // Inner list of mons
       const calcMons = [];
-  
-      i=0; 
+
+      i = 0;
       // Player team mons
-      for(const set of sets) {
+      for (const set of sets) {
         calcMons.push(`
         <li>
           <a class='text-light' href='#report-mon-${i++}'>
@@ -914,7 +972,7 @@ ${JSON.stringify(fieldEffects, null, 2)}
         </li>
         `);
       }
-  
+
       // Generate list
       ul.innerHTML += `
       <li>
@@ -927,9 +985,47 @@ ${JSON.stringify(fieldEffects, null, 2)}
       </li>
       `;
     }
-  
+
+    // Include Usage Stats in report
+    if (config.includeUsageStats) {
+
+      // Inner list of mons
+      const usageMons = [];
+
+      i = 0;
+      // Player team mons
+      for (const threat of usage) {
+        // Break if exceeds 'limit' mons
+        if (i >= CONFIG.limit.mons) break;
+
+        const species = threat.species;
+
+        usageMons.push(`
+        <li>
+          <a class='text-light' href='#report-usage-${species}'>
+            ${species}
+          </a>
+        </li>
+        `);
+
+        i++;
+      }
+
+      // Generate list
+      ul.innerHTML += `
+     <li>
+       <a class='text-light' href='#report-usage-stats'>
+         Usage Stats
+       </a>
+       <ul>
+         ${usageMons.join('')}
+       </ul>
+     </li>
+     `;
+    }
+
     // Add to contents
-    toc.appendChild(ul);  
+    toc.appendChild(ul);
   }
 
   // Add sections to the report
@@ -953,6 +1049,11 @@ ${JSON.stringify(fieldEffects, null, 2)}
   // Add Damage Calcs
   if (damageCalcs) {
     td.appendChild(damageCalcs);
+  }
+
+  // Add Usage Stats
+  if (usageStats) {
+    td.appendChild(usageStats);
   }
 
   // td.appendChild(notes);
@@ -1063,38 +1164,38 @@ function update(format = null) {
     // Clear the table
     clearTable();
 
-    switch(document.active) {
+    switch (document.active) {
       case 0: // Speed Tiers
-      {
-        // Generate the speed tiers table
-        const tiers = calculateSpeedTiers(sets, DATA[format], info, level);
+        {
+          // Generate the speed tiers table
+          const tiers = calculateSpeedTiers(sets, DATA[format], info, level);
 
-        // Populate speed tiers
-        populateSpeedTiers(tiers, sets);
-      }; break;
+          // Populate speed tiers
+          populateSpeedTiers(tiers, sets);
+        }; break;
       case 1: // Damage Calcs
-      {
-        // Generate the table for the sets, format, level & field
-        const table = calculateTeam(sets, DATA[format], info, level);
+        {
+          // Generate the table for the sets, format, level & field
+          const table = calculateTeam(sets, DATA[format], info, level);
 
-        // Populate the pkmn table
-        populateTable(table);
-      }; break;
+          // Populate the pkmn table
+          populateTable(table);
+        }; break;
       case 2: // Report
-      {
-        // Generate both speed tiers, damage calcs table
-        const tiers = calculateSpeedTiers(sets, DATA[format], info, level);
-        const table = calculateTeam(sets, DATA[format], info, level);
+        {
+          // Generate both speed tiers, damage calcs table
+          const tiers = calculateSpeedTiers(sets, DATA[format], info, level);
+          const table = calculateTeam(sets, DATA[format], info, level);
 
-        // Populate the report
-        populateReport(table, tiers, sets, level);
-      };
-      break;
-      
+          // Populate the report
+          populateReport(table, tiers, DATA[format], sets, level);
+        };
+        break;
+
       default: // Unhandled
-      {
-        console.error(`Active page is unhandled: ${document.active}`);
-      }
+        {
+          console.error(`Active page is unhandled: ${document.active}`);
+        }
     }
   }
 }
@@ -1174,7 +1275,7 @@ function copyReport() {
     } else if (window.getSelection) {
       // Create text range for the whole document
       range = document.createRange();
-      
+
       // Highlight report area
       range.selectNode(body);
       window.getSelection().addRange(range);

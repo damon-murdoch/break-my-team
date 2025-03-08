@@ -469,6 +469,21 @@
                       </th>
                     </tr>
                     <tr>
+                      <th class="align-middle">
+                        Usage Stats
+                      </th>
+                      <th>
+                        <select id="include-usage" class="form-control" onchange="update()">
+                          <option value="include" selected>
+                            Include
+                          </option>
+                          <option value="exclude">
+                            Exclude
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
                       <th colspan="2">
                         <a class="btn btn-secondary" href="#" onClick="copyReport()">
                           Copy To Clipboard

@@ -4,7 +4,7 @@ const CONFIG = {
     moves: 10, // # of moves to display (damage only)
     items: 1, // # of items to display (damage only)
     teras: 1, // # of tera types to display (damage only)
-    mons: 49 // # of mons to rank (both damage and speed tiers)
+    mons: 60 // # of mons to rank (both damage and speed tiers)
   }, 
   usage: {
     ability: 10, // Min. Usage % to display ability (speed tiers)

@@ -680,7 +680,7 @@ function calculateTeam(team, usage, format, level = 50) {
           // Loop over the species
           for (const speciesUsage of usage) {
             // Break after limit
-            if (monCount > CONFIG.limit.mons)
+            if (monCount >= CONFIG.limit.mons)
               break;
 
             // Get the opponent species
@@ -722,7 +722,7 @@ function calculateTeam(team, usage, format, level = 50) {
           // Loop over the species
           for (const speciesUsage of usage) {
             // Break after limit
-            if (monCount > CONFIG.limit.mons)
+            if (monCount >= CONFIG.limit.mons)
               break;
 
             // Get the opponent species
@@ -1088,7 +1088,7 @@ function calculateSpeedTiers(team, usage, format, level = 50) {
   for (const set of usage) {
 
     // Break after limit
-    if (monCount > CONFIG.limit.mons)
+    if (monCount >= CONFIG.limit.mons)
       break;
 
     const tiers = applySpeedTierModifiers(
