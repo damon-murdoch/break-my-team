@@ -87,6 +87,20 @@
                       </th>
                     </tr>
                     <tr>
+                      <th colspan="2">
+                        <a class="btn btn-secondary form-control" href="#" onClick="copyLink()">
+                          Copy Link to Clipboard
+                        </a>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th colspan="2">
+                        <a class="btn btn-danger form-control" onClick="resetPage()">
+                          Reset Page
+                        </a>
+                      </th>
+                    </tr>
+                    <tr>
                       <th colspan=2>
                         Options
                       </th>
@@ -99,8 +113,16 @@
                         <input id="lvl-input" class="form-control" type="number" min="1" max="100" value="50" onchange="update()">
                       </th>
                     </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Threats
+                      </th>
+                      <th>
+                        <input id="threats-input" class="form-control" type="number" min="1" max="100" value="50" onchange="update()">
+                      </th>
+                    </tr>
                   </thead>
-                  <tbody id="table-damage-options">
+                  <tbody id="table-damage-options" hidden>
                     <tr>
                       <th class="align-middle">
                         Sort By
@@ -327,7 +349,7 @@
                       </th>
                     </tr>
                   </tbody>
-                  <tbody id="table-speed-options">
+                  <tbody id="table-speed-options" hidden>
                     <tr>
                       <th class="align-middle">
                         Sort By
@@ -391,7 +413,7 @@
                       </th>
                     </tr>
                   </tbody>
-                  <tbody id="table-report-options">
+                  <tbody id="table-report-options" hidden>
                     <tr>
                       <th class="align-middle">
                         Team Name
@@ -474,10 +496,10 @@
                       </th>
                       <th>
                         <select id="include-usage" class="form-control" onchange="update()">
-                          <option value="include" selected>
+                          <option value="include">
                             Include
                           </option>
-                          <option value="exclude">
+                          <option value="exclude" selected>
                             Exclude
                           </option>
                         </select>
@@ -485,8 +507,8 @@
                     </tr>
                     <tr>
                       <th colspan="2">
-                        <a class="btn btn-secondary" href="#" onClick="copyReport()">
-                          Copy To Clipboard
+                        <a class="btn btn-secondary form-control" href="#" onClick="copyReport()">
+                          Copy Report to Clipboard
                         </a>
                       </th>
                     </tr>
@@ -502,7 +524,7 @@
                   <h2>
                     <!-- Main Page Title Goes Here-->
                     Pokémon Matchup Tool
-                    <span class="h6 text-secondary">v0.0.1</span>
+                    <span class="h6 text-secondary">v1.0.0</span>
                   </h2>
                   <p class="text-secondary">
                     <!-- Minor Page Subtitle Goes Here -->

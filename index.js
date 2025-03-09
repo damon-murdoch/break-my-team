@@ -14,6 +14,10 @@ function getLevel() {
   return parseInt(document.getElementById('lvl-input').value);
 }
 
+function getThreatLimit() {
+  return parseInt(document.getElementById('threats-input').value); 
+}
+
 function getFormat() {
   return document.getElementById('fmt-select').value;
 }
@@ -32,8 +36,27 @@ function getTerrain() {
   return terrain;
 }
 
-function getGameType() {
-  return document.getElementById('field-input').value;
+function getPlayerOppChoice(playerChoice, oppChoice) {
+  let option = 'none';
+  
+  // Both options match
+  if (playerChoice === oppChoice) {
+    // Both are true
+    if (playerChoice === true) {
+      option = 'Both';
+    }
+  }
+  else // Neither option matches
+  {
+    // Either case is true
+    if (playerChoice === true) {
+      option = 'Player';
+    } else {
+      option = 'Opponent';
+    }
+  }
+
+  return option;
 }
 
 function getReportConfig() {
@@ -68,6 +91,19 @@ function getReportConfig() {
   }
 }
 
+function setReportConfig(config) {
+  // Team Name / Author
+  document.getElementById('team-name').value = config.teamName;
+  document.getElementById('team-author').value = config.teamAuthor;
+
+  // True/False Inclusion Properties
+  document.getElementById('include-toc').value = config.includeToC ? "include" : "exclude";
+  document.getElementById('include-paste').value = config.includeTeamPaste ? "include" : "exclude";
+  document.getElementById('include-speed').value = config.includeSpeedTiers ? "include" : "exclude";
+  document.getElementById('include-damage').value = config.includeUsageStats ? "include" : "exclude";
+  document.getElementById('include-usage').value = config.includeDamageCalcs ? "include" : "exclude";
+}
+
 function getSpeedTierConfig() {
 
   // Sorting Method
@@ -90,11 +126,35 @@ function getSpeedTierConfig() {
   }
 }
 
-function getConfigFieldEffects() {
+function setSpeedTierConfig (config) {
+  // Sorting Method
+  document.getElementById('sort-speed').value = config.sort;
+
+  // Ability select
+  const aeSelect = getPlayerOppChoice(
+    config.player.ability, 
+    config.other.ability
+  );
+
+  // Update the drop-down menu
+  document.getElementById('ae-select').value = aeSelect;
+
+  // Ability select
+  const ieSelect = getPlayerOppChoice(
+    config.player.item, 
+    config.other.item
+  );
+
+  // Update the drop-down menu
+  document.getElementById('ie-select').value = ieSelect;
+}
+
+function getFieldEffects() {
 
   // Default (Game Type)
   const fieldEffects = {
-    gameType: getGameType()
+    gameType: document.getElementById('field-input').value, 
+    sort: document.getElementById('sort-input').value
   };
 
   // Weather
@@ -130,6 +190,50 @@ function getConfigFieldEffects() {
   return fieldEffects;
 }
 
+function setFieldEffects(config) {
+  document.getElementById('field-input').value = config.gameType;
+
+  // Sort method
+  if (config.sort) {
+    document.getElementById('sort-input').value = config.sort;
+  }
+
+  // Weather Select
+  if (config.weather) {
+    document.getElementById('weather-select').value = config.weather;
+  }
+
+  // Terrain Select
+  if (config.terrain) {
+    document.getElementById('terrain-select').value = config.terrain;
+  }
+
+  // Gravity
+  if (config.gravity) {
+    document.getElementById('gravity-select').value = 'true';
+  }
+
+  // Beads of Ruin
+  if (config.isBeadsOfRuin) {
+    document.getElementById('bor-select').value = 'true';
+  }
+
+  // Sword of Ruin
+  if (config.isSwordOfRuin) {
+    document.getElementById('sor-select').value = 'true';
+  }
+
+  // Tablets of Ruin
+  if (config.isTabletsOfRuin) {
+    document.getElementById('tor-select').value = 'true';
+  }
+
+  // Vessel of Ruin
+  if (config.isVesselOfRuin) {
+    document.getElementById('vor-select').value = 'true';
+  }
+}
+
 function getPlayerEffects() {
   // Get the value for the screens, reflect drop-downs
   const screens = document.getElementById('screens-select').value;
@@ -145,6 +249,27 @@ function getPlayerEffects() {
       'isReflect': (reflect == 'Opponent' || reflect == 'Both')
     }
   }
+}
+
+function setPlayerEffects(config) {
+
+  // Check screens choice
+  const screns = getPlayerOppChoice(
+    config.player.isLightScreen, 
+    config.opponent.isLightScreen
+  );
+
+  // Update the 'screens' choice
+  document.getElementById('screens-select').value = screns;
+
+  // Check reflect choice
+  const reflect = getPlayerOppChoice(
+    config.player.isReflect,
+    config.opponent.isReflect
+  );
+
+  // Update the 'reflect' choice
+  document.getElementById('reflect-select').value = reflect;
 }
 
 function getFormatInfo(format) {
@@ -340,9 +465,16 @@ function addPokemon(set, id = null) {
 // importShowdown(): void
 // Imports the pokemon from the user's
 // clipboard to the form
-function importShowdown() {
-  // Get the text from the textarea
-  const content = document.getElementById("text-import").value;
+function importShowdown(content = null) {
+
+  // No team provided
+  if (content === null) {
+    // Get the text from the textarea
+    content = document.getElementById("text-import").value;
+  }
+
+  // Save paste data
+  document.paste = content;
 
   // Parse the sets from the import
   const sets = parseSets(content);
@@ -611,10 +743,13 @@ function getStatsTable(mon) {
   `;
 }
 
-function populateReport(table, tiers, usage, sets, level) {
+function populateReport(table, tiers, usage, info, sets, level) {
 
   // Get the report config
   const config = getReportConfig();
+
+  // Get the max. number of mons
+  const threatLimit = getThreatLimit();
 
   // Get all of the team members
   const members = Object.keys(table);
@@ -645,6 +780,9 @@ function populateReport(table, tiers, usage, sets, level) {
     <h5 class='text-muted'>
       Generated using the <a class='text-muted' href='https://www.dragapult.xyz/break-my-team'>Pokemon Matchup Tool</a>
     </h5>
+    <h6 class='text-muted'>
+      Data Set: ${getInfoStr(info)}
+    </h6>
   `;
 
   // Team paste div
@@ -655,20 +793,8 @@ function populateReport(table, tiers, usage, sets, level) {
     <h4 id='report-team-paste'>
       Team Paste
     </h4>
+    <code ><pre class='text-light'>${document.paste}</pre></code>
     `;
-
-    // Create team paste code block
-    const code = document.createElement('code');
-    const pre = document.createElement('pre');
-    // Ensure white text
-    pre.classList = 'text-light';
-    // Add the sets
-    for (const set of sets) {
-      // Add the tooltip to the html
-      pre.innerHTML += `${getMonTooltip(set)}\n`;
-    }
-    code.appendChild(pre);
-    teamPaste.appendChild(code);
   }
 
   // Usage Stats div
@@ -685,7 +811,7 @@ function populateReport(table, tiers, usage, sets, level) {
     let i = 0;
     for (const threat of usage) {
       // Break if exceeds 'limit' mons
-      if (i >= CONFIG.limit.mons) break;
+      if (i >= threatLimit) break;
 
       const species = threat.species;
 
@@ -792,7 +918,7 @@ function populateReport(table, tiers, usage, sets, level) {
   if (config.includeDamageCalcs && members.length > 0) {
 
     // Get the common field effects
-    const fieldEffects = getConfigFieldEffects();
+    const fieldEffects = getFieldEffects();
 
     // Add the player effects to the field effects
     fieldEffects.playerEffects = getPlayerEffects();
@@ -996,7 +1122,7 @@ ${JSON.stringify(fieldEffects, null, 2)}
       // Player team mons
       for (const threat of usage) {
         // Break if exceeds 'limit' mons
-        if (i >= CONFIG.limit.mons) break;
+        if (i >= threatLimit) break;
 
         const species = threat.species;
 
@@ -1188,7 +1314,7 @@ function update(format = null) {
           const table = calculateTeam(sets, DATA[format], info, level);
 
           // Populate the report
-          populateReport(table, tiers, DATA[format], sets, level);
+          populateReport(table, tiers, DATA[format], info, sets, level);
         };
         break;
 
@@ -1294,6 +1420,121 @@ function copyReport() {
   // Else, do nothing
 }
 
+// Copy link
+function copyLink() {
+  const url = new URL("/index.html", CONFIG.url);
+
+  // Active Page
+  url.searchParams.append('active', document.active);
+
+  // Format Selected
+  url.searchParams.append('format', getFormat());
+  
+  // Level Selected
+  url.searchParams.append('level', getLevel());
+  
+  // Threats Selected
+  url.searchParams.append('threats', getThreatLimit());
+
+  // Field Effects
+  const fieldEffects = btoa(JSON.stringify(getFieldEffects()));
+  url.searchParams.append('field', fieldEffects);
+
+  // Player Effects
+  const playerEffects = btoa(JSON.stringify(getPlayerEffects()));
+  url.searchParams.append('player', playerEffects);
+  
+  // Speed Tier Config
+  const speedTierConfig = btoa(JSON.stringify(getSpeedTierConfig()));
+  url.searchParams.append('speed', speedTierConfig);
+
+  // Report Config
+  const reportConfig = btoa(JSON.stringify(getReportConfig()));
+  url.searchParams.append('report', reportConfig);
+
+  // Convert the team to a base64-encoded string
+  const team = btoa(document.paste);
+
+  // Team Data
+  url.searchParams.append('team', team);
+
+  // Convert url to string and copy
+  navigator.clipboard.writeText(url.toString());
+
+  alert("Page link copied to clipboard!");
+}
+
+function loadSearchParams() {
+  // Parse the params from the query
+  const query = window.location.search;
+  const params = new URLSearchParams(query);
+
+  // Order-of-operations:
+  // 1. load level, threats, type, format (independent of team)
+  // 2. load team
+  // 3. load field, player, speed & report configs
+  // 4. profit?????
+
+  // Has 'level' input
+  if (params.has('level')) {
+    document.getElementById('lvl-input').value = parseInt(params.get('level'));
+  }
+
+  // Has 'threats' input
+  if (params.has('threats')) {
+    document.getElementById('threats-input').value = parseInt(params.get('threats'));
+  }
+
+  // Has 'format' input
+  if (params.has('format')) {
+    document.getElementById('fmt-select').value = params.get('format');
+  }
+
+  // Has 'team' input
+  if (params.has('team')) {
+    // Parse the team from base64
+    const team = atob(params.get('team'));
+
+    // Import the team
+    importShowdown(team);
+
+    // Only check these if team is provided
+    
+    // Worker functions for config
+
+    // Field Effects
+    if (params.has('field')) {
+      // Parse the json-encoded config from the params
+      const config = JSON.parse(atob(params.get('field')));
+      setFieldEffects(config);
+    }
+
+    // Player Effects
+    if (params.has('player')) {
+      const config = JSON.parse(atob(params.get('player')));
+      setPlayerEffects(config)
+    }
+
+    // Speed Tier Config
+    if (params.has('speed')) {
+      const config = JSON.parse(atob(params.get('speed')));
+      setSpeedTierConfig(config);
+    }
+
+    // Report Config
+    if (params.has('report')) {
+      const config = JSON.parse(atob(params.get('report')));
+      setReportConfig(config);
+    }
+  }
+  // Update the form
+  update();
+}
+
+function resetPage() {
+  window.location.replace(CONFIG.url);
+}
+
 // Import from clipboard event listener
 document
   .getElementById("paste-import")
@@ -1319,4 +1560,8 @@ document
   `;
   });
 
+// Populate Formats
 getFormatDropdown();
+
+// Load from Params
+loadSearchParams();

@@ -189,6 +189,22 @@ function getSpriteString(species, item = null, tooltip = null, id = null) {
   </th>`;
 }
 
+// Month Names (For generating Info String)
+const monthNames = [
+  "January", "February", "March", 
+  "April", "May", "June",
+  "July", "August", "September", 
+  "October", "November", "December"
+];
+
+function getInfoStr(info) {
+  // Get the month name for the info
+  const month = monthNames[info.month-1];
+
+  // Generate info string
+  return `${month} ${info.year}, ${info.format} (${info.rating})`;
+}
+
 function getUsageStr(usage, min = 1) {
   let str = [];
   for (const u of usage) {

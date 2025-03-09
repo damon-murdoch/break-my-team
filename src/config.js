@@ -1,4 +1,5 @@
 const CONFIG = {
+  url: "https://www.dragapult.xyz/break-my-team", 
   limit: {
     spreads: 1, // # of spreads to display (damage only)
     moves: 10, // # of moves to display (damage only)

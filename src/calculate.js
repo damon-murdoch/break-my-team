@@ -320,7 +320,7 @@ function combineFieldEffects(atkMon, defMon, defaultField, playerEffects, player
 function challengeSpecies(mon, usage, options = {}) {
 
   // Generate the field based on the program config
-  const defaultField = getConfigFieldEffects();
+  const defaultField = getFieldEffects();
 
   // Get player-specific field effects
   const playerEffects = getPlayerEffects();
@@ -631,6 +631,9 @@ function calculateTeam(team, usage, format, level = 50) {
   // Get the 'Generation' object for the format
   const gen = calc.Generations.get(format.gen);
 
+  // Get the max. number of threats
+  const threatLimit = getThreatLimit();
+
   // Calcs Table
   const totalCalcs = {};
 
@@ -680,7 +683,7 @@ function calculateTeam(team, usage, format, level = 50) {
           // Loop over the species
           for (const speciesUsage of usage) {
             // Break after limit
-            if (monCount >= CONFIG.limit.mons)
+            if (monCount >= threatLimit)
               break;
 
             // Get the opponent species
@@ -722,7 +725,7 @@ function calculateTeam(team, usage, format, level = 50) {
           // Loop over the species
           for (const speciesUsage of usage) {
             // Break after limit
-            if (monCount >= CONFIG.limit.mons)
+            if (monCount >= threatLimit)
               break;
 
             // Get the opponent species
@@ -1019,6 +1022,9 @@ function calculateSpeedTiers(team, usage, format, level = 50) {
   // Get speed tier display config
   const config = getSpeedTierConfig();
 
+  // Get the max. number of threats
+  const threatLimit = getThreatLimit();
+
   // Get the 'Generation' object for the format
   const gen = calc.Generations.get(format.gen);
 
@@ -1088,7 +1094,7 @@ function calculateSpeedTiers(team, usage, format, level = 50) {
   for (const set of usage) {
 
     // Break after limit
-    if (monCount >= CONFIG.limit.mons)
+    if (monCount >= threatLimit)
       break;
 
     const tiers = applySpeedTierModifiers(
