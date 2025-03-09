@@ -778,7 +778,7 @@ function populateReport(table, tiers, usage, info, sets, level) {
       Created by ${config.teamAuthor}
     </h4>
     <h5 class='text-muted'>
-      Generated using the <a class='text-muted' href='https://www.dragapult.xyz/break-my-team'>Pokemon Matchup Tool</a>
+      Generated using <a class='text-muted' href='https://www.dragapult.xyz/break-my-team'>Break My Team</a>
     </h5>
     <h6 class='text-muted'>
       Data Set: ${getInfoStr(info)}
@@ -1422,7 +1422,7 @@ function copyReport() {
 
 // Copy link
 function copyLink() {
-  const url = new URL("/index.html", CONFIG.url);
+  const url = new URL(CONFIG.url);
 
   // Active Page
   url.searchParams.append('active', document.active);
