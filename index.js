@@ -100,8 +100,8 @@ function setReportConfig(config) {
   document.getElementById('include-toc').value = config.includeToC ? "include" : "exclude";
   document.getElementById('include-paste').value = config.includeTeamPaste ? "include" : "exclude";
   document.getElementById('include-speed').value = config.includeSpeedTiers ? "include" : "exclude";
-  document.getElementById('include-damage').value = config.includeUsageStats ? "include" : "exclude";
-  document.getElementById('include-usage').value = config.includeDamageCalcs ? "include" : "exclude";
+  document.getElementById('include-usage').value = config.includeUsageStats ? "include" : "exclude";
+  document.getElementById('include-damage').value = config.includeDamageCalcs ? "include" : "exclude";
 }
 
 function getSpeedTierConfig() {
