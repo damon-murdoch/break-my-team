@@ -1267,6 +1267,42 @@ function populateSpeedTiers(tiers, sets) {
   }
 }
 
+function populateQuiz(table, tiers, format, info, sets, level) {
+
+  // Different types of questions:
+  // which is faster?
+  // how much damage does [attack] do? with 'n' different options (e.g. 20-40%, 40-60%, etc.)
+
+  // Get the quiz config
+  // const config = getQuizConfig();
+
+  // Types of questions:
+  // 1. player -> opp atk dmg
+  // 2. opp -> player atk dmg
+  // 3. player speed > opp speed?
+
+  // TODO: Generate based on config w/ allowed questions etc.
+  const questionTypes = [0, 1, 2];
+  
+  // Select a random question type
+  const questionType = sampleArray(questionTypes);
+
+  console.log(questionTypes, questionType);
+
+  // Switch on question type
+  switch(questionType) {
+    case 0: { // player -> opp atk dmg
+      generatePlayerAttackQuestion(table, format, info, sets, level);
+    }; break;
+    case 1: { // opp -> player atk dmg
+      generateOpponentAttackQuestion(table, format, info, sets, level);
+    }; break;
+    case 2: { // player speed > opp speed?
+      generateSpeedQuestion(tiers, format, info, sets, level);
+    }; break;
+  }
+}
+
 // Update the calcs page
 function update(format = null) {
 
@@ -1315,13 +1351,20 @@ function update(format = null) {
 
           // Populate the report
           populateReport(table, tiers, DATA[format], info, sets, level);
-        };
-        break;
+        }; break;
+      case 3: // Quiz 
+        {
+          // Generate both speed tiers, damage calcs table
+          const tiers = calculateSpeedTiers(sets, DATA[format], info, level);
+          const table = calculateTeam(sets, DATA[format], info, level);
 
+          // Populate the quiz page
+          populateQuiz(table, tiers, DATA[format], info, sets, level);
+        }; break;
       default: // Unhandled
         {
           console.error(`Active page is unhandled: ${document.active}`);
-        }
+        }; break;
     }
   }
 }
@@ -1333,10 +1376,12 @@ function setPageReport() {
   document.getElementById('table-report-options').hidden = '';
   document.getElementById('table-damage-options').hidden = 'hidden';
   document.getElementById('table-speed-options').hidden = 'hidden';
+  document.getElementById('table-quiz-options').hidden = 'hidden';
 
   // Lighten the defensive tab, to show that it is hidden
   document.getElementById("option-damage").className = "bg-secondary";
   document.getElementById("option-speed").className = "bg-secondary";
+  document.getElementById("option-quiz").className = "bg-secondary";
 
   // Darken the offensive tab, to show that it is active
   document.getElementById("option-report").className = "bg-dark";
@@ -1352,10 +1397,12 @@ function setTableDamageCalcs() {
   document.getElementById('table-report-options').hidden = 'hidden';
   document.getElementById('table-damage-options').hidden = '';
   document.getElementById('table-speed-options').hidden = 'hidden';
+  document.getElementById('table-quiz-options').hidden = 'hidden';
 
   // Lighten the defensive tab, to show that it is hidden
   document.getElementById("option-report").className = "bg-secondary";
   document.getElementById("option-speed").className = "bg-secondary";
+  document.getElementById("option-quiz").className = "bg-secondary";
 
   // Darken the offensive tab, to show that it is active
   document.getElementById("option-damage").className = "bg-dark";
@@ -1371,13 +1418,36 @@ function setTableSpeedTiers() {
   document.getElementById('table-report-options').hidden = 'hidden';
   document.getElementById('table-damage-options').hidden = 'hidden';
   document.getElementById('table-speed-options').hidden = '';
+  document.getElementById('table-quiz-options').hidden = 'hidden';
 
   // Lighten the defensive tab, to show that it is hidden
   document.getElementById("option-report").className = "bg-secondary";
   document.getElementById("option-damage").className = "bg-secondary";
+  document.getElementById("option-quiz").className = "bg-secondary";
 
   // Darken the offensive tab, to show that it is active
   document.getElementById("option-speed").className = "bg-dark";
+
+  // Update the form
+  update();
+}
+
+function setTableQuiz() {
+  document.active = 3;
+
+  // Hide the damage options menu, show the speed options menu
+  document.getElementById('table-report-options').hidden = 'hidden';
+  document.getElementById('table-damage-options').hidden = 'hidden';
+  document.getElementById('table-speed-options').hidden = 'hidden';
+  document.getElementById('table-quiz-options').hidden = '';
+
+  // Lighten the defensive tab, to show that it is hidden
+  document.getElementById("option-report").className = "bg-secondary";
+  document.getElementById("option-damage").className = "bg-secondary";
+  document.getElementById("option-speed").className = "bg-secondary";
+
+  // Darken the offensive tab, to show that it is active
+  document.getElementById("option-quiz").className = "bg-dark";
 
   // Update the form
   update();
@@ -1565,3 +1635,6 @@ getFormatDropdown();
 
 // Load from Params
 loadSearchParams();
+
+// Init quiz stats
+initQuizStats();

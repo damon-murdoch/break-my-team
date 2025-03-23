@@ -1,3 +1,16 @@
+function sampleIndex(arr) {
+  // Get a random index within the bounds
+  return Math.floor(Math.random() * arr.length);
+}
+
+function sampleArray(arr) {
+  // Sample a random index
+  const index = sampleIndex(arr);
+
+  // Return the element
+  return arr.at(index);
+}
+
 // toCapitalCase(str: string)
 // Returns the provided string
 // with the first letter of each
@@ -191,15 +204,15 @@ function getSpriteString(species, item = null, tooltip = null, id = null) {
 
 // Month Names (For generating Info String)
 const monthNames = [
-  "January", "February", "March", 
+  "January", "February", "March",
   "April", "May", "June",
-  "July", "August", "September", 
+  "July", "August", "September",
   "October", "November", "December"
 ];
 
 function getInfoStr(info) {
   // Get the month name for the info
-  const month = monthNames[info.month-1];
+  const month = monthNames[info.month - 1];
 
   // Generate info string
   return `${month} ${info.year}, ${info.format} (${info.rating})`;
@@ -209,8 +222,7 @@ function getUsageStr(usage, min = 1) {
   let str = [];
   for (const u of usage) {
     // Not 'other', and greater than min. usage
-    if ((u.option != "Other") && (u.usage > min)) 
-    {
+    if ((u.option != "Other") && (u.usage > min)) {
       // Round to 2 decimal places
       const usage = u.usage.toFixed(1);
 

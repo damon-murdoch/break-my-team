@@ -513,6 +513,9 @@
                       </th>
                     </tr>
                   </tbody>
+                  <tbody id="table-quiz-options" hidden>
+
+                  </tbody>
                 </table>
               </div>
               <div
@@ -582,6 +585,15 @@
                             Report
                           </a>
                         </th>
+                        <th id="option-quiz" class="" scope="col">
+                          <a
+                            class="text-light"
+                            href="#"
+                            onClick="setTableQuiz()"
+                          >
+                            Quiz
+                          </a>
+                        </th>
                       </tr>
                       <tr id="tr-pkmn-head">
                         <th class="align-middle">
@@ -626,6 +638,9 @@
 
       <!-- Forme Change Data Set -->
       <script src="src/formes.js"></script>
+
+      <!-- Quiz Question Scripts -->
+      <script src="src/quiz.js"></script>
 
       <!-- Data Source Library -->
       <script src="data/data.js"></script>
