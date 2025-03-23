@@ -1,5 +1,6 @@
 function initQuizStats() {
   document.quiz = {
+    mons: null, // Mon Data
     incorrect: 0,
     correct: 0, 
     streak: 0
@@ -131,7 +132,7 @@ function generateOpponentAttackQuestion(table, format, info, sets, level) {
   `;
 }
 
-function submitSpeedAnswer(playerStat, oppStat, answer) {
+function submitSpeedAnswer(answer) {
 
   // Update quiz stats
   updateQuizStats(answer);
@@ -162,26 +163,33 @@ function submitSpeedAnswer(playerStat, oppStat, answer) {
   // Add the quiz stats to the form
   correct.innerHTML += getQuizStats();
 
-  // Dereference player and opponent speed stat columns
-  const playerStatCol = document.getElementById('quiz-player-speed');
-  const oppStatCol = document.getElementById('quiz-opponent-speed');
+  // Get the current quiz mons
+  const mons = document.quiz.mons;
+  if (mons) {
+    const playerStat = mons.player.stat;
+    const oppStat = mons.opponent.stat;
 
-  // Update the values to the raw stat
-  playerStatCol.innerHTML = playerStat;
-  oppStatCol.innerHTML = oppStat;
+    // Dereference player and opponent speed stat columns
+    const playerStatCol = document.getElementById('quiz-player-speed');
+    const oppStatCol = document.getElementById('quiz-opponent-speed');
 
-  // Player stats are higher
-  if (playerStat > oppStat) {
-    playerStatCol.classList.add('text-success');
-    oppStatCol.classList.add('text-danger');
-  // Both stats are equal
-  } else if (playerStat === oppStat) {
-    playerStatCol.classList.add('text-warning');
-    oppStatCol.classList.add('text-warning');
-  // Player stats are lower
-  } else {
-    playerStatCol.classList.add('text-danger');
-    oppStatCol.classList.add('text-success');
+    // Update the values to the raw stat
+    playerStatCol.innerHTML = `${playerStat} (Base: ${mons.player.base})`;
+    oppStatCol.innerHTML = `${oppStat} (Base: ${mons.opponent.base})`;
+
+    // Player stats are higher
+    if (playerStat > oppStat) {
+      playerStatCol.classList.add('text-success');
+      oppStatCol.classList.add('text-danger');
+    // Both stats are equal
+    } else if (playerStat === oppStat) {
+      playerStatCol.classList.add('text-warning');
+      oppStatCol.classList.add('text-warning');
+    // Player stats are lower
+    } else {
+      playerStatCol.classList.add('text-danger');
+      oppStatCol.classList.add('text-success');
+    }
   }
 
   // Add 'next question' button
@@ -194,6 +202,9 @@ function generateSpeedQuestion(tiers, format, info, sets, level) {
   const tbody = document.getElementById('tbody-pkmn-main');
 
   const mons = selectTierMons(tiers);
+
+  // Update the quiz mons
+  document.quiz.mons = mons;
 
   const playerSpecies = mons.player.species;
   const oppSpecies = mons.opponent.species;
@@ -238,13 +249,13 @@ function generateSpeedQuestion(tiers, format, info, sets, level) {
   </tr>
   <tr id='row-options'>
     <th colspan=3>
-      <button type='button' class="btn btn-success" onClick=submitSpeedAnswer(${playerStat},${oppStat},${playerStat > oppStat})>${playerSpecies}</button>
+      <button type='button' class="btn btn-success" onClick=submitSpeedAnswer(${playerStat > oppStat})>${playerSpecies}</button>
     </th>
     <th>
-      <button type='button' class="btn btn-secondary" onClick=submitSpeedAnswer(${playerStat},${oppStat},${playerStat === oppStat})>Speed Tie</button>
+      <button type='button' class="btn btn-secondary" onClick=submitSpeedAnswer(${playerStat === oppStat})>Speed Tie</button>
     </th>
     <th colspan=3>
-      <button type='button' class="btn btn-danger" onClick=submitSpeedAnswer(${playerStat},${oppStat},${playerStat < oppStat})>${oppSpecies}</button>
+      <button type='button' class="btn btn-danger" onClick=submitSpeedAnswer(${playerStat < oppStat})>${oppSpecies}</button>
     </th>
   </tr>
   `;
