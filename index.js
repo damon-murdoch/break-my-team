@@ -1298,7 +1298,7 @@ function populateQuiz(table, tiers, format, info, sets, level) {
       generateOpponentAttackQuestion(table, format, info, sets, level);
     }; break;
     case 2: { // player speed > opp speed?
-      generateSpeedQuestion(tiers, format, info, sets, level);
+      generateSpeedQuestion(tiers);
     }; break;
   }
 }
