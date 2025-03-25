@@ -514,7 +514,56 @@
                     </tr>
                   </tbody>
                   <tbody id="table-quiz-options" hidden>
-
+                    <tr>
+                      <th colspan="2">
+                        Questions
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Attacking
+                      </th>
+                      <th>
+                        <select id="include-player-dmg" class="form-control" onchange="update()">
+                          <option value="include" selected>
+                            Include
+                          </option>
+                          <option value="exclude">
+                            Exclude
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Defending
+                      </th>
+                      <th>
+                        <select id="include-opp-dmg" class="form-control" onchange="update()">
+                          <option value="include" selected>
+                            Include
+                          </option>
+                          <option value="exclude">
+                            Exclude
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th class="align-middle">
+                        Speeds
+                      </th>
+                      <th>
+                        <select id="include-speed-comp" class="form-control" onchange="update()">
+                          <option value="include" selected>
+                            Include
+                          </option>
+                          <option value="exclude">
+                            Exclude
+                          </option>
+                        </select>
+                      </th>
+                    </tr>
                   </tbody>
                 </table>
               </div>

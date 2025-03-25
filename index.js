@@ -15,7 +15,7 @@ function getLevel() {
 }
 
 function getThreatLimit() {
-  return parseInt(document.getElementById('threats-input').value); 
+  return parseInt(document.getElementById('threats-input').value);
 }
 
 function getFormat() {
@@ -38,7 +38,7 @@ function getTerrain() {
 
 function getPlayerOppChoice(playerChoice, oppChoice) {
   let option = 'none';
-  
+
   // Both options match
   if (playerChoice === oppChoice) {
     // Both are true
@@ -57,6 +57,18 @@ function getPlayerOppChoice(playerChoice, oppChoice) {
   }
 
   return option;
+}
+
+function getQuizConfig() {
+  const includePlayerDmg = document.getElementById('include-player-dmg').value === 'include';
+  const includeOppDmg = document.getElementById('include-opp-dmg').value === 'include';
+  const includeSpeedComp = document.getElementById('include-speed-comp').value === 'include';
+
+  return {
+    includePlayerDmg: includePlayerDmg,
+    includeOppDmg: includeOppDmg,
+    includeSpeedComp: includeSpeedComp
+  }
 }
 
 function getReportConfig() {
@@ -86,7 +98,7 @@ function getReportConfig() {
     includeToC: includeToC,
     includeTeamPaste: includeTeamPaste,
     includeSpeedTiers: includeSpeedTiers,
-    includeUsageStats: includeUsageStats, 
+    includeUsageStats: includeUsageStats,
     includeDamageCalcs: includeDamageCalcs
   }
 }
@@ -126,13 +138,13 @@ function getSpeedTierConfig() {
   }
 }
 
-function setSpeedTierConfig (config) {
+function setSpeedTierConfig(config) {
   // Sorting Method
   document.getElementById('sort-speed').value = config.sort;
 
   // Ability select
   const aeSelect = getPlayerOppChoice(
-    config.player.ability, 
+    config.player.ability,
     config.other.ability
   );
 
@@ -141,7 +153,7 @@ function setSpeedTierConfig (config) {
 
   // Ability select
   const ieSelect = getPlayerOppChoice(
-    config.player.item, 
+    config.player.item,
     config.other.item
   );
 
@@ -153,7 +165,7 @@ function getFieldEffects() {
 
   // Default (Game Type)
   const fieldEffects = {
-    gameType: document.getElementById('field-input').value, 
+    gameType: document.getElementById('field-input').value,
     sort: document.getElementById('sort-input').value
   };
 
@@ -255,7 +267,7 @@ function setPlayerEffects(config) {
 
   // Check screens choice
   const screns = getPlayerOppChoice(
-    config.player.isLightScreen, 
+    config.player.isLightScreen,
     config.opponent.isLightScreen
   );
 
@@ -394,34 +406,38 @@ function addTeraToggle(id, type = undefined) {
   // On-Click event handler (for toggling tera type)
   document.getElementById(id).addEventListener('click', async (event) => {
 
-    // Get the tera type for the id
-    const tera = document.tera[id];
-    if (tera.type) {
-      // Toggle tera enabled / disabled
-      tera.enabled = !tera.enabled;
+    // Only works on damage calc, quiz pages
+    if (document.active === 1 || document.active === 3) {
 
-      // Convert type name to lower case
-      const typeName = tera.type.toLowerCase();
+      // Get the tera type for the id
+      const tera = document.tera[id];
+      if (tera.type) {
+        // Toggle tera enabled / disabled
+        tera.enabled = !tera.enabled;
 
-      // Get the actual element in the form
-      const element = document.getElementById(id)
+        // Convert type name to lower case
+        const typeName = tera.type.toLowerCase();
 
-      // Tera is set to true
-      if (tera.enabled) {
-        // Apply tera type colour
-        element.classList.add(typeName);
+        // Get the actual element in the form
+        const element = document.getElementById(id)
+
+        // Tera is set to true
+        if (tera.enabled) {
+          // Apply tera type colour
+          element.classList.add(typeName);
+        }
+        else // Tera set to false
+        {
+          // Remove tera type colour
+          element.classList.remove(typeName);
+        }
+
+        // Refresh
+        update();
       }
-      else // Tera set to false
-      {
-        // Remove tera type colour
-        element.classList.remove(typeName);
-      }
 
-      // Refresh
-      update();
+      // No tera type, do nothing
     }
-
-    // No tera type, do nothing
   });
 }
 
@@ -1269,28 +1285,31 @@ function populateSpeedTiers(tiers, sets) {
 
 function populateQuiz(table, tiers, format, info, sets, level) {
 
-  // Different types of questions:
-  // which is faster?
-  // how much damage does [attack] do? with 'n' different options (e.g. 20-40%, 40-60%, etc.)
+  // Get quiz config from page
+  const config = getQuizConfig();
 
-  // Get the quiz config
-  // const config = getQuizConfig();
+  // List of allowed questions
+  const questionTypes = [];
 
-  // Types of questions:
-  // 1. player -> opp atk dmg
-  // 2. opp -> player atk dmg
-  // 3. player speed > opp speed?
+  // Check allowed question types
 
-  // TODO: Generate based on config w/ allowed questions etc.
-  const questionTypes = [0, 1, 2];
-  
+  // Player Damage
+  if (config.includePlayerDmg)
+    questionTypes.push(0);
+
+  // Opponent Damage
+  if (config.includeOppDmg)
+    questionTypes.push(1);
+
+  // Speed Difference
+  if (config.includeSpeedComp)
+    questionTypes.push(2);
+
   // Select a random question type
   const questionType = sampleArray(questionTypes);
 
-  console.log(questionTypes, questionType);
-
   // Switch on question type
-  switch(questionType) {
+  switch (questionType) {
     case 0: { // player -> opp atk dmg
       generatePlayerAttackQuestion(table, format, info, sets, level);
     }; break;
@@ -1499,10 +1518,10 @@ function copyLink() {
 
   // Format Selected
   url.searchParams.append('format', getFormat());
-  
+
   // Level Selected
   url.searchParams.append('level', getLevel());
-  
+
   // Threats Selected
   url.searchParams.append('threats', getThreatLimit());
 
@@ -1513,7 +1532,7 @@ function copyLink() {
   // Player Effects
   const playerEffects = btoa(JSON.stringify(getPlayerEffects()));
   url.searchParams.append('player', playerEffects);
-  
+
   // Speed Tier Config
   const speedTierConfig = btoa(JSON.stringify(getSpeedTierConfig()));
   url.searchParams.append('speed', speedTierConfig);
@@ -1569,7 +1588,7 @@ function loadSearchParams() {
     importShowdown(team);
 
     // Only check these if team is provided
-    
+
     // Worker functions for config
 
     // Field Effects

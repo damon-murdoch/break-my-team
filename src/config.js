@@ -11,5 +11,16 @@ const CONFIG = {
     ability: 10, // Min. Usage % to display ability (speed tiers)
     item: 10 // Min. Usage % to display item (speed tiers)
   }, 
+  quiz: {
+    speed: {
+      // Set to '1' for no speed ties
+      min: 1, // Min. Variance
+      max: 40, // Max. Variance
+    },
+    damage: {
+      min: 30, // Max. Damage %
+      max: 120, // Max. Damage %
+    }
+  },
   scarf: 100 // Min. Speed (EVs) for scarf (speed tiers)
 }

@@ -53,23 +53,29 @@ function selectTableMons(table, defending=false) {
   const opponents = table[playerMonName].opponents;
   const oppKeys = Object.keys(opponents);
 
-  // Placeholder
-  let filtered = null;
-  if (defending) {
-    filtered = oppKeys.filter(x => {
-      return (
-        opponents[x].at(0) !== undefined && 
-        opponents[x].at(0).defending.length > 0
-      )
-    });
-  } else {
-    filtered = oppKeys.filter(x => {
-      return (
-        opponents[x].at(0) !== undefined && 
-        opponents[x].at(0).attacking.length > 0
-      )
-    });
-  }
+  // Filter the opponent keys
+  const filtered = oppKeys.filter((x) => {
+
+    // Get the opponent for the index
+    const opponent = opponents[x].at(0);
+    if (opponent) {
+      // Opponent attacking
+      if (defending) {
+        // At least one defending move
+        if (opponent.defending.length > 0)
+          return true;
+      }
+      else // Player attacking
+      {
+        // At least one attacking move
+        if (opponent.attacking.length > 0)
+          return true;
+      }
+    }
+
+    // Exclude
+    return false;
+  });
 
   // Sample a random opponent mon from the table
   const oppMonName = sampleArray(filtered);
@@ -79,7 +85,11 @@ function selectTableMons(table, defending=false) {
   return mons
 }
 
-function selectTierMons(tiers, min = 20) {
+function selectTierMons(tiers) {
+
+  // Dereference Min/Max. Value Constants
+  const min = CONFIG.quiz.speed.min;
+  const max = CONFIG.quiz.speed.max;
 
   // Mon data
   let mons = {
@@ -92,10 +102,23 @@ function selectTierMons(tiers, min = 20) {
   mons.player = sampleArray(playerMons);
 
   // Opponent Mons (Mons with usage)
-  const oppMons = tiers.filter((x) => x.usage !== null && (
-    // Exclude mons which have a greater than 'min' stat difference on either side
-    (mons.player.species !== x.species) && ((mons.player.stat + min) >= x.stat) && ((mons.player.stat - min) <= x.stat)
-  ));
+  const oppMons = tiers.filter((x) => {
+    // Filter out player mons / mons with the same species
+    if (x.usage === null || mons.player.species === x.species)
+      return false;
+
+    // Get the absolute difference between the speeds
+    const diff = Math.abs(mons.player.stat - x.stat);
+
+    // Less than min, or greater than max
+    if (diff <= min || diff >= max)
+      return false;
+
+    // Valid filter
+    return true;
+  });
+
+  // Sample a random mon from the remainder
   mons.opponent = sampleArray(oppMons);
 
   // Return mon data
@@ -115,8 +138,30 @@ function generatePlayerAttackQuestion(table) {
   const playerSpecies = mons.player.name.name;
   const oppSpecies = mons.opponent.pokemon.name;
 
-  // Sample random index from 'attacking'
-  const attacking = sampleArray(mons.opponent.attacking);
+  // Opposing Pokemon's hp stat
+  const hp = mons.opponent.pokemon.stats.hp;
+
+  // Search for attacks which meet the damage filters
+  let filteredAttacks = mons.opponent.attacking.filter((x) => {
+    // Attack damage range
+    const range = x.data.range;
+
+    // Get the min/max atk damage (as %)
+    const min = getDamagePercentage(range.at(0), hp);
+    const max = getDamagePercentage(range.at(range.length-1), hp);
+
+    // Include if within requirements, exclude otherwise
+    return ((min >= CONFIG.quiz.damage.min) && (max <= CONFIG.quiz.damage.max));
+  });
+
+  // No matching attacks found
+  if (filteredAttacks.length === 0) {
+    // Include the best attack only
+    filteredAttacks = [mons.opponent.attacking.at(0)];
+  }
+
+  // Sample random index from filtered attacks
+  const attacking = sampleArray(filteredAttacks);
   const fullDesc = attacking.fullDesc;
 
   // Get the start of the desc before the actual calc
@@ -124,7 +169,6 @@ function generatePlayerAttackQuestion(table) {
 
   // For generating possible answers
   const range = attacking.data.range;
-  const hp = mons.opponent.pokemon.stats.hp;
 
   // Get the list of available answers
   const answers = getAttackAnswers(range, hp);
@@ -265,8 +309,30 @@ function generateOpponentAttackQuestion(table) {
   const playerSpecies = mons.player.name.name;
   const oppSpecies = mons.opponent.pokemon.name;
 
+  // Player Pokemon's hp stat
+  const hp = mons.player.stats.hp;
+
+  // Search for attacks which meet the damage filters
+  let filteredAttacks = mons.opponent.defending.filter((x) => {
+    // Attack damage range
+    const range = x.data.range;
+
+    // Get the min/max atk damage (as %)
+    const min = getDamagePercentage(range.at(0), hp);
+    const max = getDamagePercentage(range.at(range.length-1), hp);
+
+    // Include if within requirements, exclude otherwise
+    return ((min >= CONFIG.quiz.damage.min) && (max <= CONFIG.quiz.damage.max));
+  });
+
+  // No matching attacks found
+  if (filteredAttacks.length === 0) {
+    // Include the best attack only
+    filteredAttacks = [mons.opponent.defending.at(0)];
+  }
+
   // Sample random index from 'defending'
-  const defending = sampleArray(mons.opponent.defending);
+  const defending = sampleArray(filteredAttacks);
   const fullDesc = defending.fullDesc;
 
   // Get the start of the desc before the actual calc
@@ -274,7 +340,6 @@ function generateOpponentAttackQuestion(table) {
 
   // For generating possible answers
   const range = defending.data.range;
-  const hp = mons.player.stats.hp;
 
   // Get the list of available answers
   const answers = getAttackAnswers(range, hp);
