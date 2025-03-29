@@ -5,7 +5,7 @@ $Location = Get-Location;
 Set-Location $PSScriptRoot;
 
 # Move to 'data' folder
-Set-Location "data";
+Set-Location "usage";
 
 # Build vgc format data
 & "python" "build_vgc.py"
@@ -17,7 +17,7 @@ Set-Location "data";
 Set-Location "..";
 
 # Move 'data/data.js' to 'src/data.js' (overwrite)
-Move-Item "data/data.js" "src/data.js" -Force;
+Move-Item "usage/data.js" "src/data.js" -Force;
 
 # Move back to original path
 Set-Location -Path $Location;
