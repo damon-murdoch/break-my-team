@@ -1,27 +1,46 @@
-# EBR EV Spread Utility
-## Emerald Battle Frontier Romhack EV Spread Utility
+# Break My Team
+# Team Matchup and Report Generation Tool
 ### Created by Damon Murdoch ([@SirScrubbington](https://twitter.com/SirScrubbington))
 
-## Description
-
-The EBR EV Spread Utility is a web application designed to assist users in generating instructions for recreating Pokémon sets in the game. The tool is specifically developed for use with the Pokémon Emerald Battle Revolution Decompilation Project.
-
-## Features
-
-- **Showdown Set Export Input:** Paste a Pokémon Showdown! Set Export into the provided textarea, and the utility will generate instructions for recreating the set in-game.
-- **Support for Multiple Sets:** You can input multiple sets at once.
+The Break my Team tool is a tool for testing your team's matchups to other threats in the metagame
+as well as speed tiers, report generation, and more. This program supports VGC formats going all
+the way back to 2014, up to the most recent formats (Currently, Regulation G). 
 
 ## Usage
 
-1. **Paste Showdown Set Export:** Paste a Pokémon Showdown! Set Export into the textarea.
-2. **Generate Instructions:** Click the "Generate Instructions" button to generate instructions based on the input.
-3. **Review Output:** The generated instructions will be displayed below the textarea.
+You can view the live version of the tool here: 
+[Break My Team](https://www.dragapult.xyz/break-my-team)
 
-## Credits
+For more information, please see `USAGE.md`
 
-- **Developer:** [Damon Murdoch](https://twitter.com/SirScrubbington)
-- **Project:** Pokémon Emerald Battle Revolution Decompilation Project
+## Updating Data
 
-## Important Notes
+In order for the data in this project to remain up to date, the data sources
+must be updated. New formats will be added to this project's dependent sub-repository,
+[ps-usage-parser](https://github.com/damon-murdoch/ps-usage-parser), as they are made available.
 
-- Please ensure the accuracy of IVs, especially where Hidden Power is involved, as the tool does not check them.
+In order to manually update the format data source `src/data.js`, you 
+may run the `Update-UsageStats.ps1` script from the root path of the repository.
+
+## Problems / Improvements
+
+If you have any suggested improvements for this project or encounter any issues, please feel free to open an 
+issue [here](../../issues) or send me a message on Twitter detailing the issue and how it can be replicated.
+
+## Changelog
+
+### 1.1.0
+
+Moved data parsing script to new repository [ps-usage-parser](https://github.com/damon-murdoch/ps-usage-parser), 
+and added it as a sub-repository. Added build script `Update-UsageStats.ps1` that builds the showdown data and moves it to
+the `src` directory. `readme.md` and `usage.md` files have been added and updated. Added link to the usage document to the 
+main page.
+
+### 1.0.0
+
+Initial release with working damage calc, speed tiers, report and quiz pages.
+
+## Support this Project
+
+If you'd like to support this project and other future projects, please feel free to use the PayPal donation link below.
+[https://www.paypal.com/paypalme/sirsc](https://www.paypal.com/paypalme/sirsc)
