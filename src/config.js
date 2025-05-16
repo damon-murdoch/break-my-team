@@ -22,5 +22,9 @@ const CONFIG = {
       max: 120, // Max. Damage %
     }
   },
+  settings: {
+    load: false, // Load settings on 'share'
+    save: false, // Save settings on 'share'
+  }, 
   scarf: 100 // Min. Speed (EVs) for scarf (speed tiers)
 }

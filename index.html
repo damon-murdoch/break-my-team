@@ -52,619 +52,671 @@
         </nav>
       </div>
     </div>
-    <div id="body" class="container bg-dark rounded overflow-auto my-2 pb-3" style="opacity: 0.8; max-height: 90vh">
-      <div id="title" class="text-light text-center">
-        <div>
-          <!-- Main Page Content Goes Here -->
-          <div id="body" class="container-fluid">
-            <div class="row">
-              <div
-                id="table-pkmn-container"
-                class="col overflow-auto container bg-dark rounded ml-2 my-2"
-                style="
-                  min-width: 320px;
-                  max-width: 16vw;
-                  opacity: 0.8;
-                  max-height: 90vh;
-                "
+    <div id="body" class="container bg-dark rounded overflow-auto my-2 pb-3" style="opacity: 0.8; max-height: 90vh; overflow: hidden;">
+      <div id="parent" class="text-light text-center">
+        <!-- Main Page Content Goes Here -->
+        <div id="body" class="container-fluid">
+          <div class="row">
+            <div
+              id="table-pkmn-container"
+              class="col overflow-auto container bg-dark rounded ml-2 my-2"
+              style="
+                min-width: 320px;
+                max-width: 16vw;
+                opacity: 0.8;
+                max-height: 85vh;
+              "
+            >
+              <table
+                id="table-options"
+                class="table table-dark"
+                style="overflow-y: scroll"
               >
-                <table
-                  id="table-options"
-                  class="table table-dark"
-                  style="overflow-y: scroll"
-                >
-                  <thead id="pkmn-header" class="thead-dark">
+                <thead id="pkmn-header" class="thead-dark">
+                  <tr>
+                    <th colspan=2>
+                      Format
+                    </th>
+                  </tr>
+                  <tr>
+                    <th colspan=2>
+                      <select class="form-control" id="fmt-select" onChange="update(value)">
+                        <!-- Options added by index.js -->
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th colspan="2">
+                      <a class="btn btn-secondary form-control" href="#" onClick="copyLink()">
+                        Copy Link to Clipboard
+                      </a>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th colspan="2">
+                      <a class="btn btn-danger form-control" onClick="resetPage()">
+                        Reset Page
+                      </a>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th colspan=2>
+                      Options
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Level
+                    </th>
+                    <th>
+                      <input id="lvl-input" class="form-control" type="number" min="1" max="100" value="50" onchange="update()">
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Threats
+                    </th>
+                    <th>
+                      <input id="threats-input" class="form-control" type="number" min="1" max="100" value="50" onchange="update()">
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="table-damage-options" hidden>
+                  <tr>
+                    <th class="align-middle">
+                      Sort By
+                    </th>
+                    <th>
+                      <select id="sort-input" class="form-control" onchange="update()">
+                        <option value="usage">
+                          Usage
+                        </option>
+                        <option value="best">
+                          Best First
+                        </option>
+                        <option value="worst" selected>
+                          Worst First
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Field
+                    </th>
+                    <th>
+                      <select id="field-input" class="form-control" onchange="update()">
+                        <option>
+                          Singles
+                        </option>
+                        <option selected>
+                          Doubles
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th colspan=2>
+                      Weather & Terrain
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Weather
+                    </th>
+                    <th>
+                      <select id="weather-select" class="form-control" onchange="update()">
+                        <option value="none" selected>
+                          Default
+                        </option>
+                        <option value="Sand">
+                          Sand
+                        </option>
+                        <option value="Sun">
+                          Sun
+                        </option>
+                        <option value="Rain">
+                          Rain
+                        </option>
+                        <option value="Hail">
+                          Hail
+                        </option>
+                        <option value="Snow">
+                          Snow
+                        </option>
+                        <option value="Harsh Sunshine">
+                          Harsh Sun
+                        </option>
+                        <option value="Heavy Rain">
+                          Heavy Rain
+                        </option>
+                        <option value="Strong Winds">
+                          Strong Winds
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Terrain
+                    </th>
+                    <th>
+                      <select id="terrain-select" class="form-control" onchange="update()">
+                        <option value="none" selected>
+                          Default
+                        </option>
+                        <option value="Electric">
+                          Electric
+                        </option>
+                        <option value="Psychic">
+                          Psychic
+                        </option>
+                        <option value="Grassy">
+                          Grassy
+                        </option>
+                        <option value="Misty">
+                          Misty
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th colspan=2>
+                      Player Effects
+                    </th>
+                  </tr>
+                  <tr>
+                    <th>
+                      Light Screen
+                    </th>
+                    <th>
+                      <select id="screens-select" class="form-control" onchange="update()">
+                        <option value="none" selected>
+                          Default
+                        </option>
+                        <option value="Player">
+                          Player
+                        </option>
+                        <option value="Opponent">
+                          Opponent
+                        </option>
+                        <option value="Both">
+                          Both
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th>
+                      Reflect
+                    </th>
+                    <th>
+                      <select id="reflect-select" class="form-control" onchange="update()">
+                        <option value="none" selected>
+                          Default
+                        </option>
+                        <option value="Player">
+                          Player
+                        </option>
+                        <option value="Opponent">
+                          Opponent
+                        </option>
+                        <option value="Both">
+                          Both
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th colspan="2">
+                      Other Effects
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Gravity
+                    </th>
+                    <th>
+                      <select id="gravity-select" class="form-control" onchange="update()">
+                        <option value="false" selected>
+                          Disabled
+                        </option>
+                        <option value="true">
+                          Enabled
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Beads of Ruin
+                    </th>
+                    <th>
+                      <select id="bor-select" class="form-control" onchange="update()">
+                        <option value="false" selected>
+                          Disabled
+                        </option>
+                        <option value="true">
+                          Enabled
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Sword of Ruin
+                    </th>
+                    <th>
+                      <select id="sor-select" class="form-control" onchange="update()">
+                        <option value="false" selected>
+                          Disabled
+                        </option>
+                        <option value="true">
+                          Enabled
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Tablets of Ruin
+                    </th>
+                    <th>
+                      <select id="tor-select" class="form-control" onchange="update()">
+                        <option value="false" selected>
+                          Disabled
+                        </option>
+                        <option value="true">
+                          Enabled
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Vessel of Ruin
+                    </th>
+                    <th>
+                      <select id="vor-select" class="form-control" onchange="update()">
+                        <option value="false" selected>
+                          Disabled
+                        </option>
+                        <option value="true">
+                          Enabled
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                </tbody>
+                <tbody id="table-speed-options" hidden>
+                  <tr>
+                    <th class="align-middle">
+                      Sort By
+                    </th>
+                    <th>
+                      <select id="sort-speed" class="form-control" onchange="update()">
+                        <option value="fast" selected>
+                          Fastest First
+                        </option>
+                        <option value="slow">
+                          Slowest First
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th colspan="2">
+                      Items & Abilities
+                    </th>
+                  </tr>
+                  <tr>
+                    <th>
+                      Items
+                    </th>
+                    <th>
+                      <select id="ie-select" class="form-control" onchange="update()">
+                        <option value="none">
+                          Hide Both
+                        </option>
+                        <option value="Player">
+                          Show Player
+                        </option>
+                        <option value="Opponent">
+                          Show Others
+                        </option>
+                        <option value="Both" selected>
+                          Show Both
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th>
+                      Abilities
+                    </th>
+                    <th>
+                      <select id="ae-select" class="form-control" onchange="update()">
+                        <option value="none">
+                          Hide Both
+                        </option>
+                        <option value="Player">
+                          Show Player
+                        </option>
+                        <option value="Opponent">
+                          Show Others
+                        </option>
+                        <option value="Both" selected>
+                          Show Both
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                </tbody>
+                <tbody id="table-report-options" hidden>
+                  <tr>
+                    <th class="align-middle">
+                      Team Name
+                    </th>
+                    <th>
+                      <input id="team-name" class="form-control" value="My Team" onchange="update()">
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Team Author
+                    </th>
+                    <th>
+                      <input id="team-author" class="form-control" value="Me" onchange="update()">
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Table of Contents
+                    </th>
+                    <th>
+                      <select id="include-toc" class="form-control" onchange="update()">
+                        <option value="include" selected>
+                          Include
+                        </option>
+                        <option value="exclude">
+                          Exclude
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Team Paste
+                    </th>
+                    <th>
+                      <select id="include-paste" class="form-control" onchange="update()">
+                        <option value="include" selected>
+                          Include
+                        </option>
+                        <option value="exclude">
+                          Exclude
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Speed Tiers
+                    </th>
+                    <th>
+                      <select id="include-speed" class="form-control" onchange="update()">
+                        <option value="include" selected>
+                          Include
+                        </option>
+                        <option value="exclude">
+                          Exclude
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Damage Calcs
+                    </th>
+                    <th>
+                      <select id="include-damage" class="form-control" onchange="update()">
+                        <option value="simple" selected>
+                          Simple
+                        </option>
+                        <option value="classic" selected>
+                          Classic
+                        </option>
+                        <option value="exclude">
+                          Exclude
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Usage Stats
+                    </th>
+                    <th>
+                      <select id="include-usage" class="form-control" onchange="update()">
+                        <option value="asList">
+                          As List
+                        </option>
+                        <option value="asTable">
+                          As Table
+                        </option>
+                        <option value="exclude" selected>
+                          Exclude
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th colspan="2">
+                      <a class="btn btn-secondary form-control" href="#" onClick="copyReport()">
+                        Copy Report to Clipboard
+                      </a>
+                    </th>
+                  </tr>
+                </tbody>
+                <tbody id="table-quiz-options" hidden>
+                  <tr>
+                    <th colspan="2">
+                      Questions
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Attacking
+                    </th>
+                    <th>
+                      <select id="include-player-dmg" class="form-control" onchange="update()">
+                        <option value="include" selected>
+                          Include
+                        </option>
+                        <option value="exclude">
+                          Exclude
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Defending
+                    </th>
+                    <th>
+                      <select id="include-opp-dmg" class="form-control" onchange="update()">
+                        <option value="include" selected>
+                          Include
+                        </option>
+                        <option value="exclude">
+                          Exclude
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Speeds
+                    </th>
+                    <th>
+                      <select id="include-speed-comp" class="form-control" onchange="update()">
+                        <option value="include" selected>
+                          Include
+                        </option>
+                        <option value="exclude">
+                          Exclude
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                </tbody>
+                <tbody id="table-usage-options" hidden>
+                  <tr>
+                    <th class="align-middle">
+                      Search
+                    </th>
+                    <th>
+                      <input id="usage-search" class="form-control" placeholder="Dragapult" oninput="update()">
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Metadata
+                    </th>
+                    <th>
+                      <select id="usage-metadata" class="form-control" onchange="update()">
+                        <option value="include">
+                          Include
+                        </option>
+                        <option value="exclude" selected>
+                          Exclude
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="align-middle">
+                      Teammates
+                    </th>
+                    <th>
+                      <select id="usage-teammates" class="form-control" onchange="update()">
+                        <option value="include" selected>
+                          Include
+                        </option>
+                        <option value="exclude">
+                          Exclude
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div
+              id="table-coverage-container"
+              class="col m-2 overflow-auto text-center container bg-dark rounded mr-2 my-2"
+              style="max-width: 78vw; opacity: 0.8; max-height: 85vh"
+            >
+              <div id="title" class="text-center">
+                <h2>
+                  <!-- Main Page Title Goes Here-->
+                  Break My Team
+                  <span class="h6 text-secondary">v1.2.0</span>
+                </h2>
+                <div class="container-fluid">
+                  <p class="text-muted lead">
+                    Developed by
+                    <a class="text-secondary" href="https://twitter.com/SirScrubbington">Damon Murdoch</a>
+                  </p>
+                </div>
+                <p class="text-secondary">
+                  <!-- Minor Page Subtitle Goes Here -->
+                  Inspired by <a class="text-secondary" href="https://github.com/jake-white">Jake White's</a> BreakMyTeam tool
+                </p>
+                <p class="text-secondary">
+                  Need help? Please check the <a class="text-secondary" href="https://github.com/damon-murdoch/break-my-team/blob/main/USAGE.md">usage page</a>
+                </p>
+              </div>
+              <div id="bmt-main" class="text-center">
+                <table class="table table-dark">
+                  <thead>
                     <tr>
-                      <th colspan=2>
-                        Format
-                      </th>
-                    </tr>
-                    <tr>
-                      <th colspan=2>
-                        <select class="form-control" id="fmt-select" onChange="update(value)">
-                          <!-- Options added by index.js -->
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th colspan="2">
-                        <a class="btn btn-secondary form-control" href="#" onClick="copyLink()">
-                          Copy Link to Clipboard
-                        </a>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th colspan="2">
-                        <a class="btn btn-danger form-control" onClick="resetPage()">
-                          Reset Page
-                        </a>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th colspan=2>
-                        Options
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Level
-                      </th>
                       <th>
-                        <input id="lvl-input" class="form-control" type="number" min="1" max="100" value="50" onchange="update()">
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Threats
-                      </th>
-                      <th>
-                        <input id="threats-input" class="form-control" type="number" min="1" max="100" value="50" onchange="update()">
+                        <a id="paste-import" class="text-light" href="#">
+                          Import Team
+                        </a>
                       </th>
                     </tr>
                   </thead>
-                  <tbody id="table-damage-options" hidden>
-                    <tr>
-                      <th class="align-middle">
-                        Sort By
-                      </th>
-                      <th>
-                        <select id="sort-input" class="form-control" onchange="update()">
-                          <option value="usage">
-                            Usage
-                          </option>
-                          <option value="best">
-                            Best First
-                          </option>
-                          <option value="worst" selected>
-                            Worst First
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Field
-                      </th>
-                      <th>
-                        <select id="field-input" class="form-control" onchange="update()">
-                          <option>
-                            Singles
-                          </option>
-                          <option selected>
-                            Doubles
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th colspan=2>
-                        Weather & Terrain
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Weather
-                      </th>
-                      <th>
-                        <select id="weather-select" class="form-control" onchange="update()">
-                          <option value="none" selected>
-                            Default
-                          </option>
-                          <option value="Sand">
-                            Sand
-                          </option>
-                          <option value="Sun">
-                            Sun
-                          </option>
-                          <option value="Rain">
-                            Rain
-                          </option>
-                          <option value="Hail">
-                            Hail
-                          </option>
-                          <option value="Snow">
-                            Snow
-                          </option>
-                          <option value="Harsh Sunshine">
-                            Harsh Sun
-                          </option>
-                          <option value="Heavy Rain">
-                            Heavy Rain
-                          </option>
-                          <option value="Strong Winds">
-                            Strong Winds
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Terrain
-                      </th>
-                      <th>
-                        <select id="terrain-select" class="form-control" onchange="update()">
-                          <option value="none" selected>
-                            Default
-                          </option>
-                          <option value="Electric">
-                            Electric
-                          </option>
-                          <option value="Psychic">
-                            Psychic
-                          </option>
-                          <option value="Grassy">
-                            Grassy
-                          </option>
-                          <option value="Misty">
-                            Misty
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th colspan=2>
-                        Player Effects
-                      </th>
-                    </tr>
-                    <tr>
-                      <th>
-                        Light Screen
-                      </th>
-                      <th>
-                        <select id="screens-select" class="form-control" onchange="update()">
-                          <option value="none" selected>
-                            Default
-                          </option>
-                          <option value="Player">
-                            Player
-                          </option>
-                          <option value="Opponent">
-                            Opponent
-                          </option>
-                          <option value="Both">
-                            Both
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th>
-                        Reflect
-                      </th>
-                      <th>
-                        <select id="reflect-select" class="form-control" onchange="update()">
-                          <option value="none" selected>
-                            Default
-                          </option>
-                          <option value="Player">
-                            Player
-                          </option>
-                          <option value="Opponent">
-                            Opponent
-                          </option>
-                          <option value="Both">
-                            Both
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th colspan="2">
-                        Other Effects
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Gravity
-                      </th>
-                      <th>
-                        <select id="gravity-select" class="form-control" onchange="update()">
-                          <option value="false" selected>
-                            Disabled
-                          </option>
-                          <option value="true">
-                            Enabled
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Beads of Ruin
-                      </th>
-                      <th>
-                        <select id="bor-select" class="form-control" onchange="update()">
-                          <option value="false" selected>
-                            Disabled
-                          </option>
-                          <option value="true">
-                            Enabled
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Sword of Ruin
-                      </th>
-                      <th>
-                        <select id="sor-select" class="form-control" onchange="update()">
-                          <option value="false" selected>
-                            Disabled
-                          </option>
-                          <option value="true">
-                            Enabled
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Tablets of Ruin
-                      </th>
-                      <th>
-                        <select id="tor-select" class="form-control" onchange="update()">
-                          <option value="false" selected>
-                            Disabled
-                          </option>
-                          <option value="true">
-                            Enabled
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Vessel of Ruin
-                      </th>
-                      <th>
-                        <select id="vor-select" class="form-control" onchange="update()">
-                          <option value="false" selected>
-                            Disabled
-                          </option>
-                          <option value="true">
-                            Enabled
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
+                  <tbody id="table-pkmn-import">
                   </tbody>
-                  <tbody id="table-speed-options" hidden>
-                    <tr>
-                      <th class="align-middle">
-                        Sort By
+                </table>
+                <!-- Un-hidden when team loaded -->
+                <table id="table-pkmn" class="table table-dark" hidden>
+                  <thead>
+                    <tr id="tr-pkmn-switch">
+                      <th id="option-damage" class="" scope="col">
+                        <a
+                          class="text-light"
+                          href="#"
+                          onClick="setTableDamageCalcs()"
+                        >
+                          Damage
+                        </a>
                       </th>
-                      <th>
-                        <select id="sort-speed" class="form-control" onchange="update()">
-                          <option value="fast" selected>
-                            Fastest First
-                          </option>
-                          <option value="slow">
-                            Slowest First
-                          </option>
-                        </select>
+                      <th id="option-speed" class="" scope="col">
+                        <a
+                          class="text-light"
+                          href="#"
+                          onClick="setTableSpeedTiers()"
+                        >
+                          Speed
+                        </a>
                       </th>
-                    </tr>
-                    <tr>
-                      <th colspan="2">
-                        Items & Abilities
+                      <th id="option-usage" class="" scope="col">
+                        <a
+                          class="text-light"
+                          href="#"
+                          onClick="setTableUsage()"
+                        >
+                          Usage
+                        </a>
                       </th>
-                    </tr>
-                    <tr>
-                      <th>
-                        Items
+                      <th id="option-report" class="" scope="col">
+                        <a
+                          class="text-light"
+                          href="#"
+                          onClick="setPageReport()"
+                        >
+                          Report
+                        </a>
                       </th>
-                      <th>
-                        <select id="ie-select" class="form-control" onchange="update()">
-                          <option value="none">
-                            Hide Both
-                          </option>
-                          <option value="Player">
-                            Show Player
-                          </option>
-                          <option value="Opponent">
-                            Show Others
-                          </option>
-                          <option value="Both" selected>
-                            Show Both
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th>
-                        Abilities
-                      </th>
-                      <th>
-                        <select id="ae-select" class="form-control" onchange="update()">
-                          <option value="none">
-                            Hide Both
-                          </option>
-                          <option value="Player">
-                            Show Player
-                          </option>
-                          <option value="Opponent">
-                            Show Others
-                          </option>
-                          <option value="Both" selected>
-                            Show Both
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                  </tbody>
-                  <tbody id="table-report-options" hidden>
-                    <tr>
-                      <th class="align-middle">
-                        Team Name
-                      </th>
-                      <th>
-                        <input id="team-name" class="form-control" value="My Team" onchange="update()">
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Team Author
-                      </th>
-                      <th>
-                        <input id="team-author" class="form-control" value="Me" onchange="update()">
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Table of Contents
-                      </th>
-                      <th>
-                        <select id="include-toc" class="form-control" onchange="update()">
-                          <option value="include" selected>
-                            Include
-                          </option>
-                          <option value="exclude">
-                            Exclude
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Team Paste
-                      </th>
-                      <th>
-                        <select id="include-paste" class="form-control" onchange="update()">
-                          <option value="include" selected>
-                            Include
-                          </option>
-                          <option value="exclude">
-                            Exclude
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Speed Tiers
-                      </th>
-                      <th>
-                        <select id="include-speed" class="form-control" onchange="update()">
-                          <option value="include" selected>
-                            Include
-                          </option>
-                          <option value="exclude">
-                            Exclude
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Damage Calcs
-                      </th>
-                      <th>
-                        <select id="include-damage" class="form-control" onchange="update()">
-                          <option value="include" selected>
-                            Include
-                          </option>
-                          <option value="exclude">
-                            Exclude
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Usage Stats
-                      </th>
-                      <th>
-                        <select id="include-usage" class="form-control" onchange="update()">
-                          <option value="include">
-                            Include
-                          </option>
-                          <option value="exclude" selected>
-                            Exclude
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th colspan="2">
-                        <a class="btn btn-secondary form-control" href="#" onClick="copyReport()">
-                          Copy Report to Clipboard
+                      <th id="option-quiz" class="" scope="col">
+                        <a
+                          class="text-light"
+                          href="#"
+                          onClick="setTableQuiz()"
+                        >
+                          Quiz
                         </a>
                       </th>
                     </tr>
-                  </tbody>
-                  <tbody id="table-quiz-options" hidden>
-                    <tr>
-                      <th colspan="2">
-                        Questions
-                      </th>
-                    </tr>
-                    <tr>
+                    <tr id="tr-pkmn-head">
                       <th class="align-middle">
-                        Attacking
+                        brmt :)
                       </th>
-                      <th>
-                        <select id="include-player-dmg" class="form-control" onchange="update()">
-                          <option value="include" selected>
-                            Include
-                          </option>
-                          <option value="exclude">
-                            Exclude
-                          </option>
-                        </select>
-                      </th>
+                      <!-- Populated by sprites -->
                     </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Defending
-                      </th>
-                      <th>
-                        <select id="include-opp-dmg" class="form-control" onchange="update()">
-                          <option value="include" selected>
-                            Include
-                          </option>
-                          <option value="exclude">
-                            Exclude
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="align-middle">
-                        Speeds
-                      </th>
-                      <th>
-                        <select id="include-speed-comp" class="form-control" onchange="update()">
-                          <option value="include" selected>
-                            Include
-                          </option>
-                          <option value="exclude">
-                            Exclude
-                          </option>
-                        </select>
-                      </th>
-                    </tr>
+                  </thead>
+                  <tbody id="tbody-pkmn-main">
                   </tbody>
                 </table>
-              </div>
-              <div
-                id="table-coverage-container"
-                class="col m-2 overflow-auto text-center container bg-dark rounded mr-2 my-2"
-                style="max-width: 78vw; opacity: 0.8; max-height: 90vh"
-              >
-                <div id="title" class="text-center">
-                  <h2>
-                    <!-- Main Page Title Goes Here-->
-                    Break My Team
-                    <span class="h6 text-secondary">v1.1.0</span>
-                  </h2>
-                  <div class="container-fluid">
-                    <p class="text-muted lead">
-                      Developed by
-                      <a class="text-secondary" href="https://twitter.com/SirScrubbington">Damon Murdoch</a>
-                    </p>
-                  </div>
-                  <p class="text-secondary">
-                    <!-- Minor Page Subtitle Goes Here -->
-                    Inspired by <a class="text-secondary" href="https://github.com/jake-white">Jake White's</a> BreakMyTeam tool
-                  </p>
-                  <p class="text-secondary">
-                    Need help? Please check the <a class="text-secondary" href="https://github.com/damon-murdoch/break-my-team/USAGE.md">usage page</a>
-                  </p>
-                </div>
-                <div id="bmt-main" class="text-center">
-                  <table class="table table-dark">
-                    <thead>
-                      <tr>
-                        <th>
-                          <a id="paste-import" class="text-light" href="#">
-                            Import Team
-                          </a>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody id="table-pkmn-import">
-                    </tbody>
-                  </table>
-                  <!-- Un-hidden when team loaded -->
-                  <table id="table-pkmn" class="table table-dark" hidden>
-                    <thead>
-                      <tr id="tr-pkmn-switch">
-                        <th id="option-damage" class="" scope="col">
-                          <a
-                            class="text-light"
-                            href="#"
-                            onClick="setTableDamageCalcs()"
-                          >
-                            Damage
-                          </a>
-                        </th>
-                        <th id="option-speed" class="" scope="col">
-                          <a
-                            class="text-light"
-                            href="#"
-                            onClick="setTableSpeedTiers()"
-                          >
-                            Speed
-                          </a>
-                        </th>
-                        <th id="option-report" class="" scope="col">
-                          <a
-                            class="text-light"
-                            href="#"
-                            onClick="setPageReport()"
-                          >
-                            Report
-                          </a>
-                        </th>
-                        <th id="option-quiz" class="" scope="col">
-                          <a
-                            class="text-light"
-                            href="#"
-                            onClick="setTableQuiz()"
-                          >
-                            Quiz
-                          </a>
-                        </th>
-                      </tr>
-                      <tr id="tr-pkmn-head">
-                        <th class="align-middle">
-                          brmt :)
-                        </th>
-                        <!-- Populated by sprites -->
-                      </tr>
-                    </thead>
-                    <tbody id="tbody-pkmn-main">
-                    </tbody>
-                  </table>
-                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div id="foot"></div>
     <div id="script">
       <!-- JavaScript Source -->
 
@@ -675,9 +727,6 @@
       <!-- Pokemon Calcs Library -->
       <!-- <script src="https://unpkg.com/@smogon/calc"></script> -->
       <script src="dist/calc.min.js"></script>
-
-      <!-- Program Calculation Library -->
-      <script src="src/calculate.js"></script>
 
       <!-- Pokemon Showdown! Parsing Library -->
       <script src="src/parser.js"></script>
@@ -691,13 +740,25 @@
       <!-- Forme Change Data Set -->
       <script src="src/formes.js"></script>
 
-      <!-- Quiz Question Scripts -->
-      <script src="src/quiz.js"></script>
-
       <!-- Data Source Library -->
       <script src="src/data.js"></script>
 
-      <!-- Main Application Source Library -->
+      <!-- Damage Page Scripts -->
+      <script src="src/damage.js"></script>
+
+      <!-- Speed Tier Page Scripts -->
+      <script src="src/speed.js"></script>
+
+      <!-- Report Page Scripts-->
+      <script src="src/report.js"></script>
+
+      <!-- Usage Page Scripts-->
+      <script src="src/usage.js"></script>
+
+      <!-- Quiz Page Scripts -->
+      <script src="src/quiz.js"></script>
+
+      <!-- Main Application Scripts -->
       <script src="index.js"></script>
     </div>
   </div>

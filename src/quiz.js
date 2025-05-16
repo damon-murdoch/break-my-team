@@ -1,3 +1,36 @@
+function setTableQuiz() {
+  document.active = 3;
+  
+  // Selected
+  document.getElementById('table-quiz-options').hidden = '';
+  document.getElementById("option-quiz").className = "bg-dark";
+
+  // Unselected
+  document.getElementById('table-report-options').hidden = 'hidden';
+  document.getElementById('table-damage-options').hidden = 'hidden';
+  document.getElementById('table-speed-options').hidden = 'hidden';
+  document.getElementById('table-usage-options').hidden = 'hidden';
+
+  document.getElementById("option-report").className = "bg-secondary";
+  document.getElementById("option-damage").className = "bg-secondary";
+  document.getElementById("option-usage").className = "bg-secondary";
+  document.getElementById("option-speed").className = "bg-secondary";
+
+  update();
+}
+
+function getQuizConfig() {
+  const includePlayerDmg = document.getElementById('include-player-dmg').value === 'include';
+  const includeOppDmg = document.getElementById('include-opp-dmg').value === 'include';
+  const includeSpeedComp = document.getElementById('include-speed-comp').value === 'include';
+
+  return {
+    includePlayerDmg: includePlayerDmg,
+    includeOppDmg: includeOppDmg,
+    includeSpeedComp: includeSpeedComp
+  }
+}
+
 function initQuizStats() {
   document.quiz = {
     mons: null, // Mon Data
@@ -10,10 +43,10 @@ function initQuizStats() {
 function getQuizStats() {
   return `
     <p>
-      <p class='text-warning'>
+      <p class='text-center align-middle text-warning'>
         Streak: ${document.quiz.streak}
       </p>
-      <p class='text-secondary'>
+      <p class='text-center align-middle text-secondary'>
         <span class='text-success'>
           ${document.quiz.correct}
         </span> / 
@@ -176,50 +209,52 @@ function generatePlayerAttackQuestion(table) {
   // Question Header
   tbody.innerHTML = `
   <tr>
-    <th class='align-middle' colspan=3>
+    <th class='text-center align-middle' colspan=3>
       Player (Attacker)
     </th>
-    <th class='align-middle'>
+    <th class='text-center align-middle'>
       VS.
     </th>
-    <th class='align-middle' colspan=3>
+    <th class='text-center align-middle' colspan=3>
       Opponent (Defender)
     </th>
   </tr>
   <tr>
-    <th>
-    </th>
+    <td>
+      <!-- Padding -->
+    </td>
     ${getSpriteString(sanitiseString(playerSpecies), null)}
-    <th id='quiz-correct' colspan=3>
+    <th class='text-center' id='quiz-correct' colspan=3>
       <span classList='text-success'>${getQuizStats()}</span>
     </th>
     ${getSpriteString(sanitiseString(oppSpecies), null)}
-    <th>
-    </th>
+    <td>
+      <!-- Padding -->
+    </td>
   </tr>
   <tr id='row-question'>
-    <th colspan=7>
+    <th class='text-center' colspan=7>
       ${startDesc}:
     </th>
   </tr>
   <tr id='row-answer' hidden>
-    <th colspan=7>
+    <th class='text-center' colspan=7>
       ${fullDesc}
     </th>
   </tr>
   <tr id='row-options'>
-    <th colspan=3>
+    <th class='text-center' colspan=3>
       ${getAttackAnswerButton(answers.at(0))}
     </th>
-    <th>
+    <th class='text-center' colspan=1>
       ${getAttackAnswerButton(answers.at(1))}
     </th>
-    <th colspan=3>
+    <th class='text-center' colspan=3>
       ${getAttackAnswerButton(answers.at(2))}
     </th>
   </tr>
   <tr id='row-next' hidden>
-    <th class='align-middle' colspan=7>
+    <th class='text-center align-middle' colspan=7>
       <button type="button" class="btn btn-secondary" onClick=update()>
         Next Question
       </button>
@@ -347,50 +382,52 @@ function generateOpponentAttackQuestion(table) {
   // Question Header
   tbody.innerHTML = `
   <tr>
-    <th class='align-middle' colspan=3>
+    <th class='text-center align-middle' colspan=3>
       Opponent (Attacker)
     </th>
-    <th class='align-middle'>
+    <th class='text-center align-middle'>
       VS.
     </th>
-    <th class='align-middle' colspan=3>
+    <th class='text-center align-middle' colspan=3>
       Player (Defender)
     </th>
   </tr>
   <tr>
-    <th>
-    </th>
+    <td>
+      <!-- Padding -->
+    </td>
     ${getSpriteString(sanitiseString(oppSpecies), null)}
-    <th id='quiz-correct' colspan=3>
+    <th class='text-center' id='quiz-correct' colspan=3>
       <span classList='text-success'>${getQuizStats()}</span>
     </th>
     ${getSpriteString(sanitiseString(playerSpecies), null)}
-    <th>
-    </th>
+    <td>
+      <!-- Padding -->
+    </td>
   </tr>
   <tr id='row-question'>
-    <th colspan=7>
+    <th class='text-center' colspan=7>
       ${startDesc}:
     </th>
   </tr>
   <tr id='row-answer' hidden>
-    <th colspan=7>
+    <th class='text-center' colspan=7>
       ${fullDesc}
     </th>
   </tr>
   <tr id='row-options'>
-    <th colspan=3>
+    <th class='text-center' colspan=3>
       ${getAttackAnswerButton(answers.at(0))}
     </th>
-    <th>
+    <th class='text-center'>
       ${getAttackAnswerButton(answers.at(1))}
     </th>
-    <th colspan=3>
+    <th class='text-center' colspan=3>
       ${getAttackAnswerButton(answers.at(2))}
     </th>
   </tr>
   <tr id='row-next' hidden>
-    <th class='align-middle' colspan=7>
+    <th class='text-center align-middle' colspan=7>
       <button type="button" class="btn btn-secondary" onClick=update()>
         Next Question
       </button>
@@ -517,35 +554,37 @@ function generateSpeedQuestion(tiers) {
   // Question Header
   tbody.innerHTML = `
   <tr>
-    <th class='align-middle' colspan=3>
+    <th class='text-center align-middle' colspan=3>
       Player Speed
     </th>
-    <th class='align-middle'>
+    <th class='text-center align-middle'>
       VS.
     </th>
-    <th class='align-middle' colspan=3>
+    <th class='text-center align-middle' colspan=3>
       Opponent Speed
     </th>
   </tr>
   <tr>
-    <th>
-    </th>
+    <td colspan>
+      <!-- Padding -->
+    </td>
     ${getSpriteString(sanitiseString(playerSpecies), playerMod)}
     <th id='quiz-correct' colspan=3>
       <span classList='text-success'>${getQuizStats()}</span>
     </th>
     ${getSpriteString(sanitiseString(oppSpecies), oppMod)}
-    <th>
-    </th>
+    <td>
+      <!-- Padding -->
+    </td>
   </tr>
   <tr>
-    <th id='quiz-player-speed' class='align-middle' colspan=3>
+    <th id='quiz-player-speed' class='text-center align-middle' colspan=3>
       ${getSpeedStr(mons.player)}
     </th>
-    <th id='quiz-question'>
+    <th id='quiz-question' colspan>
       Which is faster?
     </th>
-    <th  id='quiz-opponent-speed' class='align-middle' colspan=3>
+    <th  id='quiz-opponent-speed' class='text-center align-middle' colspan=3>
       ${getSpeedStr(mons.opponent)} (${Math.floor(mons.opponent.usage)}%)
     </th>
   </tr>
@@ -561,4 +600,43 @@ function generateSpeedQuestion(tiers) {
     </th>
   </tr>
   `;
+}
+
+function populateQuiz(table, tiers, format, info, sets, level) {
+
+  // Get quiz config from page
+  const config = getQuizConfig();
+
+  // List of allowed questions
+  const questionTypes = [];
+
+  // Check allowed question types
+
+  // Player Damage
+  if (config.includePlayerDmg)
+    questionTypes.push(0);
+
+  // Opponent Damage
+  if (config.includeOppDmg)
+    questionTypes.push(1);
+
+  // Speed Difference
+  if (config.includeSpeedComp)
+    questionTypes.push(2);
+
+  // Select a random question type
+  const questionType = sampleArray(questionTypes);
+
+  // Switch on question type
+  switch (questionType) {
+    case 0: { // player -> opp atk dmg
+      generatePlayerAttackQuestion(table, format, info, sets, level);
+    }; break;
+    case 1: { // opp -> player atk dmg
+      generateOpponentAttackQuestion(table, format, info, sets, level);
+    }; break;
+    case 2: { // player speed > opp speed?
+      generateSpeedQuestion(tiers);
+    }; break;
+  }
 }

@@ -29,14 +29,19 @@ issue [here](../../issues) or send me a message on Twitter detailing the issue a
 
 ## Changelog
 
-### 1.1.0
+### v1.2.0
+
+Major update, refactored files (all pages now have their own file), implemented 'usage' page for browsing usage stats, 
+fixed several formatting issues, other improvements
+
+### v1.1.0
 
 Moved data parsing script to new repository [ps-usage-parser](https://github.com/damon-murdoch/ps-usage-parser), 
 and added it as a sub-repository. Added build script `Update-UsageStats.ps1` that builds the showdown data and moves it to
 the `src` directory. `readme.md` and `usage.md` files have been added and updated. Added link to the usage document to the 
 main page.
 
-### 1.0.0
+### v1.0.0
 
 Initial release with working damage calc, speed tiers, report and quiz pages.
 
