@@ -6,15 +6,11 @@ function setTableSpeedTiers() {
   document.getElementById("option-speed").className = "bg-dark";
 
   // Unselected
-  document.getElementById('table-report-options').hidden = 'hidden';
   document.getElementById('table-damage-options').hidden = 'hidden';
   document.getElementById('table-usage-options').hidden = 'hidden';
-  document.getElementById('table-quiz-options').hidden = 'hidden';
 
-  document.getElementById("option-report").className = "bg-secondary";
   document.getElementById("option-damage").className = "bg-secondary";
   document.getElementById("option-usage").className = "bg-secondary";
-  document.getElementById("option-quiz").className = "bg-secondary";
 
   update();
 }
@@ -302,6 +298,7 @@ function calculateSpeedTiers(team, usage, format, level = 50) {
       level: level,
       nature: set.nature,
       evs: set.evs,
+      ivs: set.ivs,
       ability: set.ability,
       moves: set.moves,
       item: set.item
@@ -383,9 +380,6 @@ function populateSpeedTiers(tiers, sets) {
   // Get the main table for the pokemon
   const tbody = document.getElementById('tbody-pkmn-main');
 
-  // Dereference column width
-  const colspan = sets.length - 4;
-
   // Create table header
   const trhead = document.createElement('tr');
 
@@ -393,7 +387,7 @@ function populateSpeedTiers(tiers, sets) {
   trhead.innerHTML = `
   <th class='align-middle'>Species</th>
   <th class='align-middle'>Stat</th>
-  <th class='align-middle' colspan=${colspan}>Modifier</th>
+  <th class='align-middle'>Modifier</th>
   <th class='align-middle'>Base</th>
   <th class='align-middle'>Spread</th>
   <th class='align-middle'>Usage</th>
@@ -440,7 +434,7 @@ function populateSpeedTiers(tiers, sets) {
     tr.innerHTML = `
     ${sprite}
     <td class='align-middle' width='16.6%'>${tier.stat}</td>
-    <td class='align-middle' width='33.2%' colspan=${colspan}>${modStr}${youStr}</td>
+    <td class='align-middle' width='33.2%'>${modStr}${youStr}</td>
     <td class='align-middle' width='16.6%'>${tier.base}</td>
     <td class='align-middle' width='16.6%'>${getSpeedStr(tier)}</td>
     <td class='align-middle' width='16.6%'>${usageStr}</td>

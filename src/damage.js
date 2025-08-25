@@ -6,15 +6,11 @@ function setTableDamageCalcs() {
   document.getElementById("option-damage").className = "bg-dark";
 
   // Unselected
-  document.getElementById('table-report-options').hidden = 'hidden';
   document.getElementById('table-usage-options').hidden = 'hidden';
   document.getElementById('table-speed-options').hidden = 'hidden';
-  document.getElementById('table-quiz-options').hidden = 'hidden';
 
-  document.getElementById("option-report").className = "bg-secondary";
   document.getElementById("option-usage").className = "bg-secondary";
   document.getElementById("option-speed").className = "bg-secondary";
-  document.getElementById("option-quiz").className = "bg-secondary";
 
   update();
 }

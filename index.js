@@ -188,7 +188,7 @@ function reset() {
 
   // Reset the headers
   const head = document.getElementById("tr-pkmn-head");
-  head.innerHTML = "<th class='align-middle'>brmt :)</th>";
+  head.innerHTML = "<th class='align-middle' style='width: 68px'>brmt :)</th>";
 
   // Clear the table
   clearTable();
@@ -243,8 +243,8 @@ function addTeraToggle(id, type = undefined) {
   // On-Click event handler (for toggling tera type)
   document.getElementById(id).addEventListener('click', async (event) => {
 
-    // Only works on damage calc, quiz pages
-    if (document.active === 1 || document.active === 3) {
+    // Only works on damage calc page
+    if (document.active === 1) {
 
       // Get the tera type for the id
       const tera = document.tera[id];
@@ -279,8 +279,13 @@ function addTeraToggle(id, type = undefined) {
 }
 
 function showPokemonTable(show = true) {
+  // Pokemon Table
   const table = document.getElementById('table-pkmn');
   table.hidden = !show;
+
+  // Common Options
+  const options = document.getElementById('table-common-options');
+  options.hidden = !show;
 }
 
 function importShowdown(content = null) {
@@ -353,11 +358,11 @@ function update(format = null) {
   // Get the sets from the document
   const sets = document.sets;
 
+  // Clear the table
+  clearTable();
+
   // Sets defined
   if (sets) {
-    // Clear the table
-    clearTable();
-
     switch (document.active) {
       case 0: // Speed Tiers
         {
@@ -375,28 +380,10 @@ function update(format = null) {
           // Populate the pkmn table
           populateTable(table);
         }; break;
-      case 2: // Report
-        {
-          // Generate both speed tiers, damage calcs table
-          const tiers = calculateSpeedTiers(sets, DATA[format], info, level);
-          const table = calculateTeam(sets, DATA[format], info, level);
-
-          // Populate the report
-          populateReport(table, tiers, DATA[format], info, sets, level);
-        }; break;
-      case 3: // Quiz 
-        {
-          // Generate both speed tiers, damage calcs table
-          const tiers = calculateSpeedTiers(sets, DATA[format], info, level);
-          const table = calculateTeam(sets, DATA[format], info, level);
-
-          // Populate the quiz page
-          populateQuiz(table, tiers, DATA[format], info, sets, level);
-        }; break;
-      case 4: // Usage
+      case 2: // Usage
         {
           // Populate the usage stats information table
-          populateUsage(DATA[format], sets);
+          populateUsage(DATA[format], sets.length);
         }; break;
       default: // Unhandled
         {
@@ -404,44 +391,59 @@ function update(format = null) {
         }; break;
     }
   }
+  else // No sets
+  {
+    // Populate usage, 
+    populateUsage(DATA[format]);
+  }
 }
 
 function loadSearchParams() {
-  // Parse the params from the query
   const query = window.location.search;
-  const params = new URLSearchParams(query);
 
-  // Order-of-operations:
-  // 1. load level, threats, type, format (independent of team)
-  // 2. load team
-  // 3. load field, player, speed & report configs
-  // 4. profit?????
+  // Query provided
+  if (query) {
 
-  // Has 'level' input
-  if (params.has('level')) {
-    document.getElementById('lvl-input').value = parseInt(params.get('level'));
+    // Parse the params from the query
+    const params = new URLSearchParams(query);
+
+    // Order-of-operations:
+    // 1. load level, threats, type, format (independent of team)
+    // 2. load team
+    // 3. profit?????
+
+    // Has 'level' input
+    if (params.has('level')) {
+      document.getElementById('lvl-input').value = parseInt(params.get('level'));
+    }
+
+    // Has 'threats' input
+    if (params.has('threats')) {
+      document.getElementById('threats-input').value = parseInt(params.get('threats'));
+    }
+
+    // Has 'format' input
+    if (params.has('format')) {
+      document.getElementById('fmt-select').value = params.get('format');
+    }
+
+    // Has 'team' input
+    if (params.has('team')) {
+      // Parse the team from base64
+      const team = atob(params.get('team'));
+
+      // Import the team
+      importShowdown(team);
+    }
+
+    // Update the form
+    update();
+  } 
+  else // No query
+  {
+    // Load usage table
+    setTableUsage();
   }
-
-  // Has 'threats' input
-  if (params.has('threats')) {
-    document.getElementById('threats-input').value = parseInt(params.get('threats'));
-  }
-
-  // Has 'format' input
-  if (params.has('format')) {
-    document.getElementById('fmt-select').value = params.get('format');
-  }
-
-  // Has 'team' input
-  if (params.has('team')) {
-    // Parse the team from base64
-    const team = atob(params.get('team'));
-
-    // Import the team
-    importShowdown(team);
-  }
-  // Update the form
-  update();
 }
 
 function resetPage() {
@@ -455,8 +457,7 @@ function copyLink() {
   const paste = document.paste;
 
   // Active team set
-  if (paste)
-  {
+  if (paste) {
     // Active Page
     url.searchParams.append('active', document.active);
 
@@ -487,17 +488,14 @@ function copyLink() {
 }
 
 // Import from clipboard event listener
-document
-  .getElementById("paste-import")
-  .addEventListener("click", async (event) => {
+document.getElementById("paste-import").addEventListener("click", async (event) => {
+  // Reset the table
+  reset();
 
-    // Reset the table
-    reset();
-
-    // Add 'import team' form
-    document.getElementById("table-pkmn-import").innerHTML = `
+  // Add 'import team' form
+  document.getElementById("table-pkmn-import").innerHTML = `
   <tr>
-    <td colspan>
+    <td>
       <textarea id='text-import' class='form-control' placeholder='Paste your team here...'></textarea>
     </td>
   </tr>
@@ -509,13 +507,10 @@ document
     </td>
   </tr>
   `;
-  });
+});
 
 // Populate Formats
 getFormatDropdown();
 
 // Load from Params
 loadSearchParams();
-
-// Init quiz stats
-initQuizStats();

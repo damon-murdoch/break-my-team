@@ -46,21 +46,11 @@ in the table. Your pokemon will be highlighted in green, and will have
 On the left-hand side of the page, in addition to the common options
 you may enable or disable held items or abilities from being included.
 
-### Report
+### Usage
 
-This page may take a long time to load - and contains a full report
-for your team including speed tiers, damage calcs and more. 
+This page shows the usage stats of all of the Pokemon in the format, 
+and is the first page displayed when loading the program. 
 
-On the left-hand side of the page you may change the team name, 
-author, and include or exclude several different sections. 
-You may also copy the contents of the report by clicking
-the 'Copy Report to Clipboard' option.
-
-### Quiz
-
-This page contains a simple quiz game, with questions related to
-damage calcs and speed tiers. It is intended to be used as a 
-memorisation tool for playing with your team. 
-
-On the left-hand side of the page you can include or exclude
-different types of questions. 
+You can search for different Pokemon using the search input on the 
+left-hand side, as well as toggle the visibility of usage metadata 
+and teammates.

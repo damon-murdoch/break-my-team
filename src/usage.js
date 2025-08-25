@@ -1,20 +1,16 @@
 function setTableUsage() {
-  document.active = 4;
+  document.active = 2;
 
   // Selected
   document.getElementById('table-usage-options').hidden = '';
   document.getElementById("option-usage").className = "bg-dark";
 
   // Unselected
-  document.getElementById('table-report-options').hidden = 'hidden';
   document.getElementById('table-damage-options').hidden = 'hidden';
   document.getElementById('table-speed-options').hidden = 'hidden';
-  document.getElementById('table-quiz-options').hidden = 'hidden';
 
-  document.getElementById("option-report").className = "bg-secondary";
   document.getElementById("option-damage").className = "bg-secondary";
   document.getElementById("option-speed").className = "bg-secondary";
-  document.getElementById("option-quiz").className = "bg-secondary";
 
   update();
 }
@@ -43,9 +39,9 @@ function getMetadata(metadata) {
 
   return `
 <th>Metadata</th>
-<td class='text-left' colspan=2>Raw Count: ${count}</td>
-<td class='text-left' colspan=2>Avg. Weight: ${weight}</td>
-<td class='text-left' colspan=2>Viability Ceiling: ${ceiling}</td>
+<td class='text-left'>Raw Count: ${count}</td>
+<td class='text-left'>Avg. Weight: ${weight}</td>
+<td class='text-left'>Viability Ceiling: ${ceiling}</td>
 `;
 }
 
@@ -73,20 +69,17 @@ function getUsageList(name, usage) {
 
   return `
 <th>${name}</th>
-<td class='text-left' colspan=3>${l.join("")}</td>
-<td class='text-left' colspan=3>${r.join("")}</td>
+<td class='text-left'>${l.join("")}</td>
+<td class='text-left'>${r.join("")}</td>
 `;
 }
 
-function populateUsage(format, sets) {
+function populateUsage(format) {
   // Usage config settings
   const config = getUsageConfig();
 
   // Get the main table for the pokemon
   const tbody = document.getElementById('tbody-pkmn-main');
-
-  // Pokemon name (title) column size
-  const colspan = sets.length;
 
   // Counter
   let n = 1;
@@ -110,7 +103,7 @@ function populateUsage(format, sets) {
     const title = document.createElement('tr');
     title.innerHTML = `
       ${sprite}
-      <th class='text-left align-middle' colspan=${colspan}>
+      <th colspan="2" class='text-left align-middle'>
         ${n}. ${usage.species}
       </th>
     `;

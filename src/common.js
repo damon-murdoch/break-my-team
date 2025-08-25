@@ -196,7 +196,7 @@ function getSpriteString(species, item = null, tooltip = null, id = null) {
   }
 
   return `
-  <th ${idHtml} class='text-center align-middle' style="position: relative;"${tooltipHtml}>
+  <th ${idHtml} class='text-center align-middle' style="position: relative; width: 68px;"${tooltipHtml}>
     <img src="img/box/${species}.png" style="width: 68px; height: auto;">
     ${itemHtml}
   </th>`;
