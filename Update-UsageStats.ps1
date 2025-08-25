@@ -2,7 +2,7 @@ Param(
     # Commit message for the upstream sub-repository
     [Alias()][Parameter(Mandatory=$False)][String]$Commit, 
     # Path of the folder to remote into (default: 'usage')
-    [Alias()][Parameter(Mandatory=$False)][String]$Path = "./usage", 
+    [Alias()][Parameter(Mandatory=$False)][String]$Path = "./data", 
     # Upstream branch to push changes to (default: 'dev')
     [Alias()][Parameter(Mandatory=$False)][String]$Remote = 'origin', 
     # Branch to check out & push changes to (default: 'dev')
@@ -18,6 +18,9 @@ Set-Location $PSScriptRoot;
 # Move to 'data' folder
 Set-Location "$Path";
 
+# Ensure requirements installed
+& "pip" "install" "-r" "requirements.txt"
+
 # Ensure on dev branch
 & "git" "checkout" "$Branch"
 
@@ -26,24 +29,6 @@ Set-Location "$Path";
 
 # Compile to 'data.js'
 & "python" "compile_js.py"
-
-# Commit switch set
-If ($Commit) {
-    # Add files to repo
-    & "git" "add" "."
-
-    # Commit changes
-    & "git" "commit" "-m" "$Commit";
-
-    # Push changes
-    & "git" "push" "$Remote" "$Branch";
-}
-
-# Move back to root
-Set-Location "..";
-
-# Move 'data/data.js' to 'src/data.js' (overwrite)
-Move-Item "$Path/data.js" "src/data.js" -Force;
 
 # Move back to original path
 Set-Location -Path $Location;

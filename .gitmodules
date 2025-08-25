@@ -1,3 +1,0 @@
-[submodule "usage"]
-	path = usage
-	url = https://github.com/damon-murdoch/ps-usage-parser
