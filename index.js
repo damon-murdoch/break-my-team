@@ -439,39 +439,6 @@ function loadSearchParams() {
 
     // Import the team
     importShowdown(team);
-
-    // Only check these if team is provided
-
-    // Advanced config load enabled
-    if (CONFIG.settings.load()) {
-
-      // Worker functions for config
-
-      // Field Effects
-      if (params.has('field')) {
-        // Parse the json-encoded config from the params
-        const config = JSON.parse(atob(params.get('field')));
-        setFieldEffects(config);
-      }
-
-      // Player Effects
-      if (params.has('player')) {
-        const config = JSON.parse(atob(params.get('player')));
-        setPlayerEffects(config)
-      }
-
-      // Speed Tier Config
-      if (params.has('speed')) {
-        const config = JSON.parse(atob(params.get('speed')));
-        setSpeedTierConfig(config);
-      }
-
-      // Report Config
-      if (params.has('report')) {
-        const config = JSON.parse(atob(params.get('report')));
-        setReportConfig(config);
-      }
-    }
   }
   // Update the form
   update();
@@ -501,25 +468,6 @@ function copyLink() {
 
     // Threats Selected
     url.searchParams.append('threats', getThreatLimit());
-
-    // Advanced config saving enabled
-    if (CONFIG.settings.save) {
-      // Field Effects
-      const fieldEffects = btoa(JSON.stringify(getFieldEffects()));
-      url.searchParams.append('field', fieldEffects);
-
-      // Player Effects
-      const playerEffects = btoa(JSON.stringify(getPlayerEffects()));
-      url.searchParams.append('player', playerEffects);
-
-      // Speed Tier Config
-      const speedTierConfig = btoa(JSON.stringify(getSpeedTierConfig()));
-      url.searchParams.append('speed', speedTierConfig);
-
-      // Report Config
-      const reportConfig = btoa(JSON.stringify(getReportConfig()));
-      url.searchParams.append('report', reportConfig);
-    }
 
     // Convert the team to a base64-encoded string
     const team = btoa(paste);
