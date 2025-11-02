@@ -158,7 +158,9 @@ function getFormatDropdown() {
 
     // Update contents
     option.id = format;
-    option.innerHTML = format;
+    option.value = format;
+
+    option.innerHTML = getFormatStr(format);
 
     // Add the option to the list
     select.appendChild(option);

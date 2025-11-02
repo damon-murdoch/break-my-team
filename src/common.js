@@ -202,22 +202,6 @@ function getSpriteString(species, item = null, tooltip = null, id = null) {
   </th>`;
 }
 
-// Month Names (For generating Info String)
-const monthNames = [
-  "January", "February", "March",
-  "April", "May", "June",
-  "July", "August", "September",
-  "October", "November", "December"
-];
-
-function getInfoStr(info) {
-  // Get the month name for the info
-  const month = monthNames[info.month - 1];
-
-  // Generate info string
-  return `${month} ${info.year}, ${info.format} (${info.rating})`;
-}
-
 function getUsageStr(usage, min = 1) {
   let str = [];
   for (const u of usage) {
@@ -379,6 +363,64 @@ function getStatsTable(mon) {
     </tr>
   </table>
   `;
+}
+
+function getFormatName(format) {
+
+  // Remove timestamp
+  format = format.slice(8);
+
+  // Remove rating (last 5 characters)
+  format = format.slice(0, format.length - 5);
+
+  const indexOfGen = format.indexOf('gen');
+  if (indexOfGen != -1) {
+    // Remove Gen(x) from format name
+    format = format.slice(0, indexOfGen) + format.slice(indexOfGen + 4)
+  }
+
+  // SWSH-era regulation formatted string
+  const indexOfRegulation = format.indexOf('regulation');
+  if (indexOfRegulation != -1) {
+    // Prettify Reg(x) in format name
+    format = format.slice(0, indexOfRegulation) + " Reg " + format[indexOfRegulation + 10].toUpperCase() + " " + format.slice(indexOfRegulation + 11); 
+  }
+  else // SCVI-era regulation string
+  {
+    const indexOfReg = format.indexOf('reg');
+    if (indexOfReg != -1) {
+      // Prettify Reg(x) in format name
+      format = format.slice(0, indexOfReg) + " Reg " + format[indexOfReg + 3].toUpperCase() + " " + format.slice(indexOfReg + 4); 
+    }
+  }
+
+  // Cleanup tasks
+  format = format.replace('vgc', " VGC ");
+  format = format.replace('bo3', " (Bo3) ");
+  format = format.replace('sun', " Sun ");
+  format = format.replace('moon', " Moon ");
+  format = format.replace('ultra', " Ultra ");
+  format = format.replace('series', " Series ");
+
+  return format;
+}
+
+function getFormatStr(format) {
+  const info = getFormatInfo(format);
+
+  // Month Names
+  const monthNames = [
+    "Jan", "Feb", "Mar",
+    "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep",
+    "Oct", "Nov", "Dec"
+  ];
+
+  // Get the month name for the info
+  const month = monthNames[info.month - 1];
+
+  // Generate info string
+  return `${getFormatName(format)} (${month} ${info.year}, ${info.rating})`;
 }
 
 function getFormatInfo(format) {
