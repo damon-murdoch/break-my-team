@@ -4,9 +4,7 @@ Param(
     # Path of the folder to remote into (default: 'usage')
     [Alias()][Parameter(Mandatory=$False)][String]$Path = "./data", 
     # Upstream branch to push changes to (default: 'dev')
-    [Alias()][Parameter(Mandatory=$False)][String]$Remote = 'origin', 
-    # Branch to check out & push changes to (default: 'dev')
-    [Alias()][Parameter(Mandatory=$False)][String]$Branch = 'dev'
+    [Alias()][Parameter(Mandatory=$False)][String]$Remote = 'origin'
 );
 
 # Get current path
@@ -20,9 +18,6 @@ Set-Location "$Path";
 
 # Ensure requirements installed
 & "pip" "install" "-r" "requirements.txt"
-
-# Ensure on dev branch
-& "git" "checkout" "$Branch"
 
 # Build vgc format data
 & "python" "build_vgc.py"
