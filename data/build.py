@@ -54,12 +54,11 @@ def build_json(
         # Generate the url, substituting the month
         month_url = url.replace("[month]", month)
 
-        print(month_url)
-
         # Loop over the formats
         for format in formats:
             # Loop over the ratings
             for rating in ratings:
+                
                 # Placeholder
                 data = None
 
