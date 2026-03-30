@@ -23,7 +23,7 @@ Set-Location "$Path";
 & "python" "build_vgc.py"
 
 # Compile to 'data.js'
-& "python" "compile_js.py"
+& "python" "compile_per_gen.py"
 
 # Move back to original path
 Set-Location -Path $Location;

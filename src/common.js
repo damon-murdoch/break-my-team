@@ -186,7 +186,18 @@ function getSpriteString(species, item = null, tooltip = null, id = null) {
   // Item html code
   let itemHtml = "";
   if (item !== null) {
-    itemHtml = `<img src="img/item/${item}.png" style="position: absolute; bottom: 0; right: 0; width: 34px; height: auto;">`;
+    itemHtml = `
+      <div>
+        <img 
+          src="img/item/${item}.png" 
+          alt="${item}" 
+          title=${item} 
+          style="position: absolute; bottom: 0; right: 0; width: 34px; height: auto;"
+        >
+        <p style='position: absolute; bottom: 0; left: 0; right: 0; color: rgba(0,0,0,0)'>
+          ${item}
+        </p>
+      </div>`;
   }
 
   // Element id code
@@ -197,8 +208,11 @@ function getSpriteString(species, item = null, tooltip = null, id = null) {
 
   return `
   <th ${idHtml} class='text-center align-middle' style="position: relative; width: 68px;"${tooltipHtml}>
-    <img src="img/box/${species}.png" style="width: 68px; height: auto;">
+    <img src="img/box/${species}.png" alt="${species}" title="${species}" style="width: 68px; height: auto;">
     ${itemHtml}
+    <p style='position: absolute; bottom: 0; left: 0; right: 0; color: rgba(0,0,0,0)'>
+      ${species}
+    </p>
   </th>`;
 }
 
@@ -420,7 +434,7 @@ function getFormatStr(format) {
   const month = monthNames[info.month - 1];
 
   // Generate info string
-  return `${getFormatName(format)} (${month} ${info.year}, ${info.rating})`;
+  return `${getFormatName(format)} (${month} ${info.year})`;
 }
 
 function getFormatInfo(format) {

@@ -80,6 +80,24 @@
                   </tr>
                   <tr>
                     <th colspan="2">
+                      <select class="form-control" id="gen-select" onChange="window.location = this.value">
+                        <option value="index.html" selected>
+                          Generation 9 (SCVI)
+                        </option>
+                        <option value="gen8.html">
+                          Generation 8 (SWSH)
+                        </option>
+                        <option value="gen7.html">
+                          Generation 7 (SM, USUM)
+                        </option>
+                        <option value="gen6.html">
+                          Generation 6 (XY, ORAS)
+                        </option>
+                      </select>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th colspan="2">
                       <select class="form-control" id="fmt-select" onChange="update(value)">
                         <!-- Options added by index.js -->
                       </select>
@@ -675,7 +693,8 @@
                           Speed
                         </a>
                       </th>
-                      <th id="option-usage" class="" scope="col">
+                      <!-- Hidden, Shown by default when no team selected -->
+                      <th id="option-usage" class="" scope="col" hidden>
                         <a
                           class="text-light"
                           href="#"
@@ -715,7 +734,7 @@
       <script src="dist/calc.min.js"></script>
 
       <!-- Data Source Library -->
-      <script src="data/data.js"></script>
+      <script src="data/gen9.js"></script>
 
       <!-- Pokemon Showdown! Parsing Library -->
       <script src="src/parser.js"></script>
