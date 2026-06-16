@@ -82,6 +82,9 @@
                     <th colspan="2">
                       <select class="form-control" id="gen-select" onChange="window.location = this.value">
                         <option value="index.html" selected>
+                          Pokémon Champions
+                        </option>
+                        <option value="gen9.html">
                           Generation 9 (SCVI)
                         </option>
                         <option value="gen8.html">
@@ -308,64 +311,11 @@
                     </th>
                   </tr>
                   <tr>
-                    <th class="align-middle">
-                      Beads of Ruin
-                    </th>
-                    <th>
-                      <select id="bor-select" class="form-control" onchange="update()">
-                        <option value="false" selected>
-                          Disabled
-                        </option>
-                        <option value="true">
-                          Enabled
-                        </option>
-                      </select>
-                    </th>
-                  </tr>
-                  <tr>
-                    <th class="align-middle">
-                      Sword of Ruin
-                    </th>
-                    <th>
-                      <select id="sor-select" class="form-control" onchange="update()">
-                        <option value="false" selected>
-                          Disabled
-                        </option>
-                        <option value="true">
-                          Enabled
-                        </option>
-                      </select>
-                    </th>
-                  </tr>
-                  <tr>
-                    <th class="align-middle">
-                      Tablets of Ruin
-                    </th>
-                    <th>
-                      <select id="tor-select" class="form-control" onchange="update()">
-                        <option value="false" selected>
-                          Disabled
-                        </option>
-                        <option value="true">
-                          Enabled
-                        </option>
-                      </select>
-                    </th>
-                  </tr>
-                  <tr>
-                    <th class="align-middle">
-                      Vessel of Ruin
-                    </th>
-                    <th>
-                      <select id="vor-select" class="form-control" onchange="update()">
-                        <option value="false" selected>
-                          Disabled
-                        </option>
-                        <option value="true">
-                          Enabled
-                        </option>
-                      </select>
-                    </th>
+                    <!-- Hidden Values for Generation 6/7/8 -->
+                    <input id="bor-select" type="hidden" value="false">
+                    <input id="sor-select" type="hidden" value="false">
+                    <input id="tor-select" type="hidden" value="false">
+                    <input id="vor-select" type="hidden" value="false">
                   </tr>
                 </tbody>
                 <tbody id="table-speed-options" hidden>
@@ -726,15 +676,15 @@
       <!-- JavaScript Source -->
 
       <!-- Pokemon Data Layer -->
-      <!-- <script src="https://unpkg.com/@smogon/calc/dist/data/production.min.js"></script> -->
-      <script src="dist/data.min.js"></script>
+      <!-- <script src="dist/data.min.js"></script> -->
+      <script src="https://unpkg.com/@smogon/calc@0.11.0/dist/data/production.min.js"></script>
 
       <!-- Pokemon Calcs Library -->
-      <!-- <script src="https://unpkg.com/@smogon/calc"></script> -->
-      <script src="dist/calc.min.js"></script>
+      <!-- <script src="dist/calc.min.js"></script> -->
+      <script src="https://unpkg.com/@smogon/calc@0.11.0/dist/production.min.js"></script>
 
       <!-- Data Source Library -->
-      <script src="data/gen9.js"></script>
+      <script src="data/genC.js"></script>
 
       <!-- Pokemon Showdown! Parsing Library -->
       <script src="src/parser.js"></script>

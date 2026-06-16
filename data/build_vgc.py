@@ -36,8 +36,12 @@ FORMATS = {
     "gen9vgc2025regibo3": ["2025-04..07"],
     "gen9vgc2025regh": ["2025-08..10"],
     "gen9vgc2025reghbo3": ["2025-08..10"],
-    "gen9vgc2026regf": ["2025-11..12","2026-01"],
-    "gen9vgc2026regfbo3": ["2025-11..12","2026-01..02"],
+    "gen9vgc2026regf": ["2025-11..12","2026-01..04"],
+    "gen9vgc2026regi": ["2026-02..05"],
+    "gen9vgc2026regfbo3": ["2025-11..12","2026-01..04"],
+    "gen9vgc2026regibo3": ["2026-02..05"],
+    "gen9championsvgc2026regma": ["2026-04..05"],
+    "gen9championsvgc2026regmabo3": ["2026-04..05"]
 }
 
 RATINGS = {"1760"}

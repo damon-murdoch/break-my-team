@@ -20,6 +20,9 @@ GENERATIONS = {
     ], 
     "9": [
         "-gen9vgc202"
+    ], 
+    "C": [
+        "-gen9championsvgc"
     ]
 }
 
