@@ -401,10 +401,18 @@ function getFormatName(format) {
   }
   else // SCVI-era regulation string
   {
-    const indexOfReg = format.indexOf('reg');
-    if (indexOfReg != -1) {
-      // Prettify Reg(x) in format name
-      format = format.slice(0, indexOfReg) + " Reg " + format[indexOfReg + 3].toUpperCase() + " " + format.slice(indexOfReg + 4); 
+    // Pokemon Champions
+    const indexOfRegM = format.indexOf('regm');
+    if (indexOfRegM != -1) {
+      format = format.slice(9, indexOfRegM) + " Reg M-" + format[indexOfRegM + 4].toUpperCase() + " " + format.slice(indexOfRegM + 5); 
+    }
+    else // Scarlet-Violet
+    {
+      const indexOfReg = format.indexOf('reg');
+      if (indexOfReg != -1) {
+        // Prettify Reg(x) in format name
+        format = format.slice(0, indexOfReg) + " Reg " + format[indexOfReg + 3].toUpperCase() + " " + format.slice(indexOfReg + 4); 
+      }
     }
   }
 

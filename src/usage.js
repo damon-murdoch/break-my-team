@@ -17,17 +17,11 @@ function setTableUsage() {
 
 function getUsageConfig() {
 
-  // Species Search
-  const search = document.getElementById('usage-search').value;
-
-  // Boolean Switch
-  const metadata = document.getElementById('usage-metadata').value === 'include';
-  const teammates = document.getElementById('usage-teammates').value === 'include';
+  // Species Drop-Down
+  const species = document.getElementById('usage-select').value; 
 
   return {
-    search: search, 
-    metadata: metadata,
-    teammates: teammates,
+    search: species
   };
 }
 
@@ -74,6 +68,25 @@ function getUsageList(name, usage) {
 `;
 }
 
+function populateUsageDropDown(format) {
+
+  // Usage species drop-down
+  const select = document.getElementById('usage-select');
+
+  // Loop over all of the species
+  for(const usage of format) {
+    // Create the option for the species
+    const option = document.createElement('option'); 
+
+    // Set value, content to species name
+    option.innerHTML = usage.species;
+    option.value = usage.species;
+
+    // Add the option to the page
+    select.appendChild(option);
+  }
+}
+
 function populateUsage(format) {
   // Usage config settings
   const config = getUsageConfig();
@@ -81,18 +94,24 @@ function populateUsage(format) {
   // Get the main table for the pokemon
   const tbody = document.getElementById('tbody-pkmn-main');
 
-  // Counter
-  let n = 1;
+  // Update species in the 'species' drop-down
+  populateUsageDropDown(format); 
 
-  // Filter applied
+  // Get species to show
+  let usage = null; 
+
+  // Show selected species
   if (config.search) {
-    // Apply search results to filter
-    format = format.filter(f => f.species.toLowerCase().includes(config.search.toLowerCase()));
+    usage = format.filter(f => f.species.toLowerCase() == (config.search.toLowerCase())).at(0);
+  }
+  else // No species selected
+  {
+    // Show highest usage mon
+    usage = format.at(0);
   }
 
-  // Loop over the format species
-  for (const usage of format) {
-
+  // Usage is defined
+  if (usage) {
     // Sanitise the pokemon name
     const species = sanitiseString(usage.species);
 
@@ -104,19 +123,11 @@ function populateUsage(format) {
     title.innerHTML = `
       ${sprite}
       <th colspan="2" class='text-left align-middle'>
-        ${n}. ${usage.species}
+        ${usage.species}
       </th>
     `;
 
     tbody.appendChild(title);
-
-    // Metadata enabled
-    if (config.metadata) {
-      // Metadata row(s)
-      const metadata = document.createElement('tr');
-      metadata.innerHTML = getMetadata(usage.metadata);
-      tbody.appendChild(metadata);
-    }
 
     // Abilities
     const abilities = document.createElement('tr');
@@ -148,7 +159,7 @@ function populateUsage(format) {
 
     // Tera Types
     const keys = Object.keys(usage);
-    if (keys.includes("tera types")) {
+    if (keys.includes("tera types") && ((usage['tera types'].count) > 0)) {
       // Tera Types
       const teraTypes = document.createElement('tr');
       teraTypes.innerHTML = getUsageList(
@@ -156,18 +167,12 @@ function populateUsage(format) {
       );
       tbody.appendChild(teraTypes);
     }
-  
-    // Teammates enabled
-    if (config.teammates) {
-      // Teammates
-      const teammates = document.createElement('tr');
-      teammates.innerHTML = getUsageList(
-        'Teammates', usage.teammates
-      );
-      tbody.appendChild(teammates);
-    }
 
-    // Usage counter
-    n++;
+    // Teammates
+    const teammates = document.createElement('tr');
+    teammates.innerHTML = getUsageList(
+      'Teammates', usage.teammates
+    );
+    tbody.appendChild(teammates);
   }
 }

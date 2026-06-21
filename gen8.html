@@ -543,39 +543,11 @@
                 <tbody id="table-usage-options" hidden>
                   <tr>
                     <th class="align-middle">
-                      Search
+                      Species
                     </th>
                     <th>
-                      <input id="usage-search" class="form-control" placeholder="Dragapult" oninput="update()">
-                    </th>
-                  </tr>
-                  <tr>
-                    <th class="align-middle">
-                      Metadata
-                    </th>
-                    <th>
-                      <select id="usage-metadata" class="form-control" onchange="update()">
-                        <option value="include">
-                          Include
-                        </option>
-                        <option value="exclude" selected>
-                          Exclude
-                        </option>
-                      </select>
-                    </th>
-                  </tr>
-                  <tr>
-                    <th class="align-middle">
-                      Teammates
-                    </th>
-                    <th>
-                      <select id="usage-teammates" class="form-control" onchange="update()">
-                        <option value="include" selected>
-                          Include
-                        </option>
-                        <option value="exclude">
-                          Exclude
-                        </option>
+                      <select id="usage-select" class="form-control" oninput="update()">
+                        <!-- Populated by -->
                       </select>
                     </th>
                   </tr>

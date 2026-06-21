@@ -301,46 +301,53 @@ function importShowdown(content = null) {
   // Save paste data
   document.paste = content;
 
-  // Parse the sets from the import
-  const sets = parseSets(content);
+  try
+  {
+    // Parse the sets from the import
+    const sets = parseSets(content);
 
-  // Init tera table
-  document.tera = {};
+    // Init tera table
+    document.tera = {};
 
-  // List of ids
-  const teras = [];
+    // List of ids
+    const teras = [];
 
-  // Index
-  let i = 0;
-  // Loop over the sets
-  for (const set of sets) {
-    // Generate the mon id
-    const id = `mon-player-${i++}`;
+    // Index
+    let i = 0;
+    // Loop over the sets
+    for (const set of sets) {
+      // Generate the mon id
+      const id = `mon-player-${i++}`;
 
-    // Add to the page
-    addPokemon(set, id);
+      // Add to the page
+      addPokemon(set, id);
 
-    // Add mon, tera type to the list
-    teras.push({ id: id, type: getTeraType(set) });
+      // Add mon, tera type to the list
+      teras.push({ id: id, type: getTeraType(set) });
+    }
+
+    // Store sets in document
+    document.sets = sets;
+
+    // Remove the import form
+    document.getElementById("table-pkmn-import").innerHTML = ``;
+
+    // Loop over the ids
+    for (const tera of teras) {
+      // Add toggle for the id, type
+      addTeraToggle(tera.id, tera.type);
+    }
+
+    // Update the table
+    setTableDamageCalcs();
+
+    // Show the Pokemon table
+    showPokemonTable(true);
   }
-
-  // Store sets in document
-  document.sets = sets;
-
-  // Remove the import form
-  document.getElementById("table-pkmn-import").innerHTML = ``;
-
-  // Loop over the ids
-  for (const tera of teras) {
-    // Add toggle for the id, type
-    addTeraToggle(tera.id, tera.type);
+  catch (e) // Failed to load team
+  {
+    alert(`Failed to load team! ${String(e)}`);
   }
-
-  // Update the table
-  setTableDamageCalcs();
-
-  // Show the Pokemon table
-  showPokemonTable(true);
 }
 
 function update(format = null) {
@@ -510,6 +517,26 @@ document.getElementById("paste-import").addEventListener("click", async (event) 
   </tr>
   `;
 });
+
+// Calc object is undefined
+if (typeof calc == 'undefined') {
+
+  // Paste import button
+  const paste = document.getElementById('paste-import');
+  
+  // Disable and hide link
+  paste.enabled = false;
+  paste.hidden = true; 
+
+  // Break my team unavailable display
+  const unavailable = document.getElementById('paste-import-unavailable');
+
+  // Enable and show warning
+  unavailable.enabled = true;
+  unavailable.hidden = false; 
+
+  console.warn("calc is undefined, break my team functionality is disabled");
+}
 
 // Populate Formats
 getFormatDropdown();
