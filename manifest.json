@@ -1,0 +1,12 @@
+{
+    "short_name": "BMT",
+    "name": "Break my Team",
+    "icons": [
+        {
+            "src": "img/shortcut.ico", 
+            "type": "image/ico"
+        }
+    ],
+    "start_url": "/?utm_source=homescreen",
+    "display": "standalone"
+}
