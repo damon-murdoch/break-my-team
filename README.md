@@ -29,6 +29,11 @@ issue [here](../../issues) or send me a message on Twitter detailing the issue a
 
 ## Changelog
 
+### v1.3.0
+
+Added support for Pokemon Champions (usage stats only at this stage), changed how usage stats are displayed to one Pokemon
+at a time, with a drop-down for species in the left-hand side of the page. 
+
 ### v1.2.0
 
 Major update, refactored files (all pages now have their own file), implemented 'usage' page for browsing usage stats, 
